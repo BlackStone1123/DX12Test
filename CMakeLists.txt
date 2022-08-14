@@ -14,6 +14,8 @@ file(GLOB_RECURSE BindableHeaders Bindable/*.h)
 file(GLOB_RECURSE BindableSource Bindable/*.cpp)
 file(GLOB_RECURSE GraphicsHeaders Graphics/*.h)
 file(GLOB_RECURSE GraphicsSource Graphics/*.cpp)
+file(GLOB_RECURSE ImGuiHeaders ImGui/*.h)
+file(GLOB_RECURSE ImGuiSource ImGui/*.cpp)
 
 set( SHADER_FILES
     shaders/VertexShader.hlsl
@@ -27,6 +29,7 @@ source_group("Source Files\\Bindable" FILES ${BindableSource})
 source_group("Header Files\\Graphics" FILES ${GraphicsHeaders})
 source_group("Source Files\\Graphics" FILES ${GraphicsSource})
 source_group("Resources\\Shaders" FILES ${SHADER_FILES} )
+source_group("ImGui" FILES ${ImGuiHeaders} ${ImGuiSource})
 
 set_source_files_properties( ${SHADER_FILES} 
     PROPERTIES
@@ -54,6 +57,8 @@ add_executable(${PROJECT_NAME}
     App.cpp
     Window.h
     Window.cpp
+    ImguiManager.h
+    ImguiManager.cpp
     ${DrawableHeaders}
     ${DrawableSource}
     ${BindableHeaders}
@@ -61,7 +66,9 @@ add_executable(${PROJECT_NAME}
     ${SHADER_FILES}
     ${GraphicsHeaders}
     ${GraphicsSource}
+    ${ImGuiHeaders}
+    ${ImGuiSource}
 )
-target_include_directories(${PROJECT_NAME} PUBLIC Drawable Bindable Graphics)
+target_include_directories(${PROJECT_NAME} PUBLIC Drawable Bindable Graphics ImGui)
 target_link_libraries(${PROJECT_NAME} PUBLIC dxgi.lib d3d12.lib d3dcompiler.lib dxguid.lib)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND editbin /subsystem:console $(OutDir)$(TargetName).exe)

@@ -43,6 +43,7 @@ private:
 	// Desc Heap
 	ComPtr<ID3D12DescriptorHeap> mRTVDescriptorHeap;
 	ComPtr<ID3D12DescriptorHeap> mDSVDescriptorHeap;
+	ComPtr<ID3D12DescriptorHeap> mSRVDescriptorHeap;
 
 	// Command Queue
 	std::unique_ptr<CommandQueue> mCopyCommandQueue;

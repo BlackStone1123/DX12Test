@@ -141,13 +141,14 @@ ComPtr<IDXGISwapChain4> GraphicsUtils::CreateSwapChain(HWND hWnd,
 }
 
 ComPtr<ID3D12DescriptorHeap> GraphicsUtils::CreateDescriptorHeap(ComPtr<ID3D12Device2> device,
-    D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors)
+    D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors, D3D12_DESCRIPTOR_HEAP_FLAGS flags)
 {
     ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
     desc.NumDescriptors = numDescriptors;
     desc.Type = type;
+    desc.Flags = flags;
 
     ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap)));
 

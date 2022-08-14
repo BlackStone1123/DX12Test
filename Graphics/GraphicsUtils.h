@@ -13,7 +13,7 @@ public:
 		ComPtr<ID3D12CommandQueue> commandQueue,
 		uint32_t width, uint32_t height, uint32_t bufferCount);
 	static ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ComPtr<ID3D12Device2> device,
-		D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors);
+		D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors, D3D12_DESCRIPTOR_HEAP_FLAGS flags = D3D12_DESCRIPTOR_HEAP_FLAGS::D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	static ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(ComPtr<ID3D12Device2> device,
 		D3D12_COMMAND_LIST_TYPE type);
 	static ComPtr<ID3D12GraphicsCommandList2> CreateCommandList(ComPtr<ID3D12Device2> device,

@@ -1,6 +1,8 @@
 #include "Graphics.h"
 #include "GraphicsUtils.h"
 #include "CommandQueue.h"
+#include "imgui_impl_dx12.h"
+#include "imgui_impl_win32.h"
 
 Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     : mWidth(width)
@@ -21,11 +23,17 @@ Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     mRTVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_RTV, mNumFrames);
     mRTVDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     mDSVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
+    mSRVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
     UpdateRenderTargetViews(mNumFrames);
     ResizeDepthBuffer();
 
     mTearingSupported = GraphicsUtils::CheckTearingSupport();
+    // init imgui d3d impl
+    ImGui_ImplDX12_Init(mDevice.Get(), mNumFrames,
+        DXGI_FORMAT_R8G8B8A8_UNORM, mSRVDescriptorHeap.Get(),
+        mSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+        mSRVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
 }
 
 Graphics::~Graphics()
@@ -60,6 +68,10 @@ void Graphics::UpdateRenderTargetViews(UINT frameCount)
 
 void Graphics::BeginFrame(float r, float g, float b, float a)
 {
+    ImGui_ImplDX12_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
     auto commandList = mDrawCommandQueue->GetCommandList(true);
     mCopyCommandQueue->GetCommandList(true);
 
@@ -89,6 +101,12 @@ void Graphics::BeginFrame(float r, float g, float b, float a)
 void Graphics::EndFrame()
 {
     auto commandList = getDrawCommandList();
+
+    ImGui::Render();
+    commandList->SetDescriptorHeaps(1, &mSRVDescriptorHeap);
+
+    ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+
     auto backBuffer = mBackBuffers[mCurrentBackBufferIndex];
 
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition

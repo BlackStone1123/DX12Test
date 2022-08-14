@@ -1,6 +1,8 @@
 #include "Window.h"
 #include "Graphics.h"
 
+#include "imgui_impl_win32.h"
+
 WindowClass WindowClass::mInstance = WindowClass();
 WindowClass::~WindowClass()
 {
@@ -51,6 +53,7 @@ Window::Window(HINSTANCE instance, int width, int height, const WCHAR* name)
     {
         pWndClass->setup(instance);
         createWindow(pWndClass->GetName(), instance, name, width, height);
+        ImGui_ImplWin32_Init(mHwnd);
         mGfx = std::make_unique<Graphics>(mHwnd, width, height);
         ShowWindow(mHwnd, SW_SHOWDEFAULT);
     }
@@ -137,8 +140,14 @@ LRESULT CALLBACK Window::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPAR
     return pWnd->HandleMsg(hWnd, msg, wParam, lParam);
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+    {
+        return true;
+    }
+
 	switch (msg)
 	{
 		// we don't want the DefProc to handle this message because

@@ -2,9 +2,12 @@
 #include "Graphics.h"
 #include "Window.h"
 #include "Box.h"
+#include "imgui.h"
+#include "ImguiManager.h"
 
 App::App(HINSTANCE hIns, int width, int height)
-	: mWnd(std::make_unique<Window>(hIns, width, height, L"DX12≤‚ ‘≥Ã–Ú"))
+	: mImguiManager(std::make_unique<ImguiManager>())
+	, mWnd(std::make_unique<Window>(hIns, width, height, L"DX12≤‚ ‘≥Ã–Ú"))
 {
 	std::mt19937 rng(std::random_device{}());
 	std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
@@ -44,6 +47,7 @@ int App::exec()
 				boxes[i]->Update(*gfx, 0.01f);
 				boxes[i]->Draw(*gfx);
 			}
+			ImGui::ShowDemoWindow(&mShowDemoWindow);
 			gfx->EndFrame();
 		}
 	}
