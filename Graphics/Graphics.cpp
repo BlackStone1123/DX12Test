@@ -103,7 +103,7 @@ void Graphics::EndFrame()
     auto commandList = getDrawCommandList();
 
     ImGui::Render();
-    commandList->SetDescriptorHeaps(1, &mSRVDescriptorHeap);
+    commandList->SetDescriptorHeaps(1, mSRVDescriptorHeap.GetAddressOf());
 
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
