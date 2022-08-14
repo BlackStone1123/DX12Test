@@ -91,7 +91,6 @@ void CommandQueue::WaitForFenceValue(uint64_t fenceValue)
 	{
 		if (m_FenceEvent)
 		{
-			// Is this function thread safe?
 			m_d3d12Fence->SetEventOnCompletion(fenceValue, m_FenceEvent);
 			::WaitForSingleObject(m_FenceEvent, DWORD_MAX);
 		}
@@ -100,5 +99,5 @@ void CommandQueue::WaitForFenceValue(uint64_t fenceValue)
 
 void CommandQueue::Flush()
 {
-	WaitForFenceValue(m_FenceValue);
+	WaitForFenceValue(Signal());
 }
