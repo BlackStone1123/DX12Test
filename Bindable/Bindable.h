@@ -13,6 +13,14 @@ public:
 class Buffer
 {
 public:
-	virtual void upload(Graphics& gfx) = 0;
+	virtual void Upload(Graphics& gfx) = 0;
 	virtual ~Buffer() = default;
+};
+
+class ImguiItem
+{
+public:
+	virtual void Display() = 0;
+	virtual void Reset() = 0;
+	virtual ~ImguiItem() = default;
 };

@@ -7,7 +7,11 @@
 #include <vector>
 #include <chrono>
 
+class ImguiItem;
+class Camera;
+class Projector;
 class CommandQueue;
+
 class Graphics
 {
 	friend class GraphicContext;
@@ -23,9 +27,13 @@ public:
 	void DrawIndexed(UINT count);
 
 	DirectX::XMMATRIX GetProjection() const;
+	DirectX::XMMATRIX GetViewMatrix() const;
+	void AddCamera(std::unique_ptr<Camera> cam);
+	void AddProjector(std::unique_ptr<Projector> proj);
+
+	void ShowImguiItems();
 
 private:
-
 	void Flush();
 	void UpdateRenderTargetViews(UINT frameCount);
 	void ResizeDepthBuffer();
@@ -65,4 +73,9 @@ private:
 	// Flags
 	bool vSync{ true };
 	bool mTearingSupported{ false };
+
+	// Imgui Items
+	std::vector<std::unique_ptr<ImguiItem>> mImguiItems;
+	Camera* mCamera{ nullptr };
+	Projector* mProj{ nullptr };
 };

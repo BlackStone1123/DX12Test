@@ -11,7 +11,7 @@ void Drawable::Draw( Graphics& gfx )
 	{
 		for (auto buffer : buffers)
 		{
-			buffer->upload(gfx);
+			buffer->Upload(gfx);
 		}
 		buffers.clear();
 	}

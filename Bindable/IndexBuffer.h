@@ -10,7 +10,7 @@ public:
 
 public:
 	virtual void Bind(Graphics& gfx) override;
-	virtual void upload(Graphics& gfx) override;
+	virtual void Upload(Graphics& gfx) override;
 
 protected:
 	UINT count;

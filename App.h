@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Helpers.h"
+#include "Timer.h"
 
 class Window;
 class ImguiManager;
@@ -18,5 +19,6 @@ private:
 	std::unique_ptr<Window> mWnd;
 
 	std::vector<std::unique_ptr<Box>> boxes;
-	bool mShowDemoWindow{ true };
+	ChiliTimer mTimer;
+	float mSpeedFactor = 1.0f;
 };

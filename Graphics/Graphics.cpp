@@ -3,6 +3,8 @@
 #include "CommandQueue.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
+#include "Bindable.h"
+#include "Camera.h"
 
 Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     : mWidth(width)
@@ -206,11 +208,47 @@ ComPtr<ID3D12GraphicsCommandList2> Graphics::getDrawCommandList()
 
 DirectX::XMMATRIX Graphics::GetProjection() const
 {
-    auto project = DirectX::XMMatrixPerspectiveFovLH(0.6f, 1, 0.1f, 500.0f);
+    if (mProj)
+    {
+        auto project = mProj->GetMatrix() * 
+            DirectX::XMMatrixScaling((float)mHeight / mWidth, 1.0f, 1.0f);
 
-    const DirectX::XMVECTOR eyePosition = DirectX::XMVectorSet(0, 0, -20, 1);
-    const DirectX::XMVECTOR focusPoint = DirectX::XMVectorSet(0, 0, 0, 1);
-    const DirectX::XMVECTOR upDirection = DirectX::XMVectorSet(0, 1, 0, 0);
-    auto view = DirectX::XMMatrixLookAtLH(eyePosition, focusPoint, upDirection);
-    return  view * project * DirectX::XMMatrixScaling((float)mHeight / mWidth, 1.0f, 1.0f);
+        return  project;
+    }
+    else
+    {
+        throw std::exception();
+    }
+}
+
+DirectX::XMMATRIX Graphics::GetViewMatrix() const
+{
+    if (mCamera)
+    {
+        return mCamera->GetMatrix();
+    }
+    else
+    {
+        throw std::exception();
+    }
+}
+
+void Graphics::AddCamera(std::unique_ptr<Camera> cam)
+{
+    mCamera = cam.get();
+    mImguiItems.push_back(std::move(cam));
+}
+
+void Graphics::AddProjector(std::unique_ptr<Projector> proj)
+{
+    mProj = proj.get();
+    mImguiItems.push_back(std::move(proj));
+}
+
+void Graphics::ShowImguiItems()
+{
+    for (auto& item : mImguiItems)
+    {
+        item->Display();
+    }
 }

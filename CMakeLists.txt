@@ -22,14 +22,11 @@ set( SHADER_FILES
     shaders/PixelShader.hlsl
 )
 
-source_group("Header Files\\Drawable" FILES ${DrawableHeaders})
-source_group("Source Files\\Drawable" FILES ${DrawableSource})
-source_group("Header Files\\Bindable" FILES ${BindableHeaders})
-source_group("Source Files\\Bindable" FILES ${BindableSource})
-source_group("Header Files\\Graphics" FILES ${GraphicsHeaders})
-source_group("Source Files\\Graphics" FILES ${GraphicsSource})
-source_group("Resources\\Shaders" FILES ${SHADER_FILES} )
+source_group("Drawable" FILES ${DrawableHeaders} ${DrawableSource})
+source_group("Bindable" FILES ${BindableHeaders} ${BindableSource})
+source_group("Graphics" FILES ${GraphicsHeaders} ${GraphicsSource})
 source_group("ImGui" FILES ${ImGuiHeaders} ${ImGuiSource})
+source_group("Resources\\Shaders" FILES ${SHADER_FILES} )
 
 set_source_files_properties( ${SHADER_FILES} 
     PROPERTIES
@@ -59,6 +56,8 @@ add_executable(${PROJECT_NAME}
     Window.cpp
     ImguiManager.h
     ImguiManager.cpp
+    Timer.h
+    Timer.cpp
     ${DrawableHeaders}
     ${DrawableSource}
     ${BindableHeaders}

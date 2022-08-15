@@ -14,7 +14,7 @@ void IndexBuffer::Bind( Graphics& gfx )
     GraphicContext::GetCommandList(gfx)->IASetIndexBuffer(&m_IndexBufferView);
 }
 
-void IndexBuffer::upload(Graphics& gfx)
+void IndexBuffer::Upload(Graphics& gfx)
 {
     // Upload index buffer data.
     GraphicsUtils::UpdateBufferResource

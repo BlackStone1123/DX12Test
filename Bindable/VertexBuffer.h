@@ -20,7 +20,7 @@ public:
 		GraphicContext::GetCommandList(gfx)->IASetVertexBuffers(0u, 1u, &m_VertexBufferView);
 	}
 
-	virtual void upload(Graphics& gfx) override
+	virtual void Upload(Graphics& gfx) override
 	{
 		GraphicsUtils::UpdateBufferResource
 		(
