@@ -39,8 +39,8 @@ private:
 	void ResizeDepthBuffer();
 	void ResizeRenderTarget();
 
-	ComPtr<ID3D12GraphicsCommandList2> getCopyCommandList();
-	ComPtr<ID3D12GraphicsCommandList2> getDrawCommandList();
+	ComPtr<ID3D12GraphicsCommandList2> GetCopyCommandList();
+	ComPtr<ID3D12GraphicsCommandList2> GetDrawCommandList();
 
 private:
 	// DirectX 12 Objects

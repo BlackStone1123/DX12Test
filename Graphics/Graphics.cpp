@@ -102,11 +102,10 @@ void Graphics::BeginFrame(float r, float g, float b, float a)
 
 void Graphics::EndFrame()
 {
-    auto commandList = getDrawCommandList();
+    auto commandList = GetDrawCommandList();
 
     ImGui::Render();
     commandList->SetDescriptorHeaps(1, mSRVDescriptorHeap.GetAddressOf());
-
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
     auto backBuffer = mBackBuffers[mCurrentBackBufferIndex];
@@ -118,7 +117,7 @@ void Graphics::EndFrame()
     );
     commandList->ResourceBarrier(1, &barrier);
 
-    mCopyCommandQueue->ExecuteCommandList(getCopyCommandList());
+    mCopyCommandQueue->ExecuteCommandList(GetCopyCommandList());
     mCopyCommandQueue->Flush();
 
     mDrawCommandQueue->ExecuteCommandList(commandList);
@@ -193,15 +192,15 @@ void Graphics::ResizeRenderTarget()
 
 void Graphics::DrawIndexed(UINT count)
 {
-    getDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
+    GetDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
 }
 
-ComPtr<ID3D12GraphicsCommandList2> Graphics::getCopyCommandList()
+ComPtr<ID3D12GraphicsCommandList2> Graphics::GetCopyCommandList()
 {
     return mCopyCommandQueue->GetCommandList(false);
 }
 
-ComPtr<ID3D12GraphicsCommandList2> Graphics::getDrawCommandList()
+ComPtr<ID3D12GraphicsCommandList2> Graphics::GetDrawCommandList()
 {
     return mDrawCommandQueue->GetCommandList(false);
 }
