@@ -24,13 +24,22 @@ public:
 	static void EnableDebugLayer();
 	static bool IsFenceComplete(uint64_t fenceValue, ComPtr<ID3D12Fence> fenceObj);
 
-	static void UpdateBufferResource
-	(
+	static void UpdateBufferResource(
 		ComPtr<ID3D12Device2> device,
 		ComPtr<ID3D12GraphicsCommandList2> commandList,
 		ID3D12Resource** pDestinationResource,
 		ID3D12Resource** pIntermediateResource,
 		size_t numElements, size_t elementSize, const void* bufferData,
 		D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE
+	);
+
+	static void CopyTextureSubresource(
+		ComPtr<ID3D12Device2> device,
+		ComPtr<ID3D12GraphicsCommandList2> commandList,
+		ID3D12Resource* pDestinationResource,
+		ID3D12Resource** pIntermediateResource,
+		uint32_t firstSubresource,
+		uint32_t numSubresources,
+		D3D12_SUBRESOURCE_DATA* subresourceData
 	);
 };

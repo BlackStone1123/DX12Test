@@ -25,7 +25,10 @@ Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     mRTVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_RTV, mNumFrames);
     mRTVDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     mDSVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
-    mSRVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+    mSRVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 5, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+    mSRVDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    mSRVCpuHandle = mSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+    mSRVGpuHandle = mSRVDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
     UpdateRenderTargetViews(mNumFrames);
     ResizeDepthBuffer();
@@ -34,8 +37,9 @@ Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     // init imgui d3d impl
     ImGui_ImplDX12_Init(mDevice.Get(), mNumFrames,
         DXGI_FORMAT_R8G8B8A8_UNORM, mSRVDescriptorHeap.Get(),
-        mSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
-        mSRVDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
+        mSRVCpuHandle, mSRVGpuHandle);
+    mSRVCpuHandle.Offset(mSRVDescriptorSize);
+    mSRVGpuHandle.Offset(mSRVDescriptorSize);
 }
 
 Graphics::~Graphics()
@@ -98,6 +102,7 @@ void Graphics::BeginFrame(float r, float g, float b, float a)
     commandList->RSSetViewports(1, &m_Viewport);
     commandList->RSSetScissorRects(1, &m_ScissorRect);
     commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+    commandList->SetDescriptorHeaps(1, mSRVDescriptorHeap.GetAddressOf());
 }
 
 void Graphics::EndFrame()
@@ -105,7 +110,6 @@ void Graphics::EndFrame()
     auto commandList = GetDrawCommandList();
 
     ImGui::Render();
-    commandList->SetDescriptorHeaps(1, mSRVDescriptorHeap.GetAddressOf());
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
 
     auto backBuffer = mBackBuffers[mCurrentBackBufferIndex];
@@ -250,4 +254,12 @@ void Graphics::ShowImguiItems()
     {
         item->Display();
     }
+}
+
+std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> Graphics::AllocHeap()
+{
+    auto res = std::make_pair(mSRVCpuHandle, mSRVGpuHandle );
+    mSRVCpuHandle.Offset(mSRVDescriptorSize);
+    mSRVGpuHandle.Offset(mSRVDescriptorSize);
+    return res;
 }

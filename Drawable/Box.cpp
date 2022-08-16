@@ -1,6 +1,7 @@
 #include "Box.h"
 #include "BindableBase.h"
 #include "Vertex.h"
+#include "Surface.h"
 
 using namespace DirectX;
 
@@ -25,14 +26,14 @@ Box::Box( Graphics& gfx,
 	{
 		const std::vector<Vertex> vertices =
 		{
-		    { XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f) }, // 0
-			{ XMFLOAT3(-1.0f,  1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) }, // 1
-			{ XMFLOAT3(1.0f,  1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f) }, // 2
-			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) }, // 3
-			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) }, // 4
-			{ XMFLOAT3(-1.0f,  1.0f,  1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f) }, // 5
-			{ XMFLOAT3(1.0f,  1.0f,  1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f) }, // 6
-			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f) }
+			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), {0.0f,1.0f} }, // 0
+			{ XMFLOAT3(-1.0f,  1.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), {0.0f, 0.0f} }, // 1
+			{ XMFLOAT3(1.0f,  1.0f, -1.0f), XMFLOAT3(1.0f, 1.0f, 0.0f), {1.0f,0.0f} }, // 2
+			{ XMFLOAT3(1.0f, -1.0f, -1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), {1.0f,1.0f} }, // 3
+			{ XMFLOAT3(-1.0f, -1.0f,  1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), {1.0f,1.0f} }, // 4
+			{ XMFLOAT3(-1.0f,  1.0f,  1.0f), XMFLOAT3(0.0f, 1.0f, 1.0f), {1.0f,0.0f} }, // 5
+			{ XMFLOAT3(1.0f,  1.0f,  1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f), {0.0f, 0.0f} }, // 6
+			{ XMFLOAT3(1.0f, -1.0f,  1.0f), XMFLOAT3(1.0f, 0.0f, 1.0f), {0.0f,1.0f} }
 		};
 
 		AddStaticBind( std::make_unique<VertexBuffer<Vertex>>( gfx,vertices ) );
@@ -52,19 +53,20 @@ Box::Box( Graphics& gfx,
 
 		AddStaticBind( std::make_unique<Topology>( gfx,D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
-		auto pvs = std::make_unique<Shader>(gfx, L"VertexShader.cso");
-		auto pps = std::make_unique<Shader>(gfx, L"PixelShader.cso");
+		auto pvs = std::make_unique<Shader>(gfx, L"TextureVS.cso");
+		auto pps = std::make_unique<Shader>(gfx, L"TexturePS.cso");
 		const std::vector<D3D12_INPUT_ELEMENT_DESC> ied =
 		{
 			{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-			{ "COLOR",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 }
+			{ "COLOR",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+			{ "TexCoord",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 }
 		};
 		
 		auto sig = std::make_unique<RootSignature>(gfx);
 		auto pso = std::make_unique<PiplineStateObject>(gfx, ied, sig->GetSignature(), pvs->GetBytecode(), pps->GetBytecode());
 		AddStaticBind(std::move(sig));
 		AddStaticBind(std::move(pso));
-
+		AddStaticBind(std::make_unique<Surface>(gfx, L"kappa50.png", true));
 	}
 	else
 	{
@@ -72,6 +74,11 @@ Box::Box( Graphics& gfx,
 	}
 
 	AddBind( std::make_unique<TransformCbuf>( gfx,*this ) );
+}
+
+Box::~Box()
+{
+
 }
 
 void Box::Update(Graphics& gfx, float dt )

@@ -45,8 +45,8 @@ private:
 	);
 
 private:
-	int mWidth{ 500 };
-	int mHeight{ 500 };
+	int mWidth{ 1200 };
+	int mHeight{ 800 };
 	HWND mHwnd;
 	std::unique_ptr<Graphics> mGfx;
 };

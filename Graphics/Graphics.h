@@ -32,6 +32,7 @@ public:
 	void AddProjector(std::unique_ptr<Projector> proj);
 
 	void ShowImguiItems();
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> AllocHeap();
 
 private:
 	void Flush();
@@ -52,6 +53,8 @@ private:
 	ComPtr<ID3D12DescriptorHeap> mRTVDescriptorHeap;
 	ComPtr<ID3D12DescriptorHeap> mDSVDescriptorHeap;
 	ComPtr<ID3D12DescriptorHeap> mSRVDescriptorHeap;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE mSRVCpuHandle;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE mSRVGpuHandle;
 
 	// Command Queue
 	std::unique_ptr<CommandQueue> mCopyCommandQueue;
@@ -65,6 +68,7 @@ private:
 
 	// Scalar Numbers
 	UINT mRTVDescriptorSize;
+	UINT mSRVDescriptorSize;
 	UINT mCurrentBackBufferIndex;
 	UINT mNumFrames{ 3 };
 	UINT mWidth{ 0 };

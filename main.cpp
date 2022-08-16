@@ -46,8 +46,8 @@ void ParseCommandLineArguments(int& clientWidth, int& clientHeight)
 
 int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow)
 {
-    int clientWidth;
-    int clientHeight;
+    int clientWidth = 1200;
+    int clientHeight = 800;
     ParseCommandLineArguments(clientWidth, clientHeight);
 
     try

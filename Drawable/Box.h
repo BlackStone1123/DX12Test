@@ -1,6 +1,7 @@
 #pragma once
 #include "DrawableBase.h"
 
+class Surface;
 class Box : public DrawableBase<Box>
 {
 public:
@@ -9,6 +10,8 @@ public:
 		std::uniform_real_distribution<float>& ddist,
 		std::uniform_real_distribution<float>& odist,
 		std::uniform_real_distribution<float>& rdist );
+	virtual ~Box();
+
 	void Update(Graphics&, float dt ) override;
 	DirectX::XMMATRIX GetTransformXM() const override;
 private:
@@ -32,4 +35,6 @@ private:
 	float dz{1.0f};
 	float dx{0.5f};
 	float dy{0.0f};
+
+	std::unique_ptr<Surface> mSurface;
 };

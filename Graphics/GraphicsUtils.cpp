@@ -268,6 +268,30 @@ void GraphicsUtils::UpdateBufferResource(
     }
 }
 
+void GraphicsUtils::CopyTextureSubresource(
+    ComPtr<ID3D12Device2> device,
+    ComPtr<ID3D12GraphicsCommandList2> commandList,
+    ID3D12Resource* pDestinationResource,
+    ID3D12Resource** pIntermediateResource,
+    uint32_t firstSubresource,
+    uint32_t numSubresources,
+    D3D12_SUBRESOURCE_DATA* subresourceData
+)
+{
+    if (pDestinationResource)
+    {
+        UINT64 requiredSize = GetRequiredIntermediateSize(pDestinationResource, firstSubresource, numSubresources);
+
+        ThrowIfFailed(device->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), D3D12_HEAP_FLAG_NONE,
+            &CD3DX12_RESOURCE_DESC::Buffer(requiredSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+            IID_PPV_ARGS(pIntermediateResource)));
+
+        UpdateSubresources(commandList.Get(), pDestinationResource, *pIntermediateResource, 0,
+            firstSubresource, numSubresources, subresourceData);
+    }
+}
+
 bool GraphicsUtils::IsFenceComplete(uint64_t fenceValue, ComPtr<ID3D12Fence> fenceObj)
 {
     return fenceObj->GetCompletedValue() >= fenceValue;
