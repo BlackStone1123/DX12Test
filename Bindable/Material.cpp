@@ -105,7 +105,7 @@ void Surface::Upload(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 
 Material::Material(Graphics& gfx)
 {
-    auto heapHandle = gfx.AllocHeap(1);
+    auto heapHandle = gfx.AllocHeap(2);
     mCpuHandle = heapHandle.first;
     mSize = heapHandle.second;
 }

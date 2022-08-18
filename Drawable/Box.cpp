@@ -69,9 +69,9 @@ Box::Box( Graphics& gfx,
 
 		auto mat = std::make_unique<Material>(gfx);
 		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/Mona_Lisa.jpg", true));
-		//mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/kappa50.png", true));
+		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/kappa50.png", true));
 		AddStaticBind(std::move(mat));
-		//AddStaticBind(std::move(std::make_unique<ChangeIndex>(gfx)));
+		AddStaticBind(std::move(std::make_unique<ChangeIndex>(gfx)));
 	}
 	else
 	{

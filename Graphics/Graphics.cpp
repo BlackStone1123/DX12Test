@@ -109,7 +109,6 @@ void Graphics::BeginFrame(float r, float g, float b, float a)
 void Graphics::EndFrame()
 {
     auto commandList = GetDrawCommandList();
-    commandList->SetGraphicsRootDescriptorTable(1, mSRVGpuHandle);
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
@@ -198,6 +197,7 @@ void Graphics::ResizeRenderTarget()
 
 void Graphics::DrawIndexed(UINT count)
 {
+    GetDrawCommandList()->SetGraphicsRootDescriptorTable(1, mSRVGpuHandle);
     GetDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
 }
 

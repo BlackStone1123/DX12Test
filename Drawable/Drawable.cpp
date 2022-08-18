@@ -25,7 +25,6 @@ void Drawable::Draw( Graphics& gfx )
 	{
 		b->Bind(gfx);
 	}
-
 	gfx.DrawIndexed( pIndexBuffer->GetCount() );
 }
 
