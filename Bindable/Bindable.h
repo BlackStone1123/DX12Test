@@ -21,6 +21,6 @@ class ImguiItem
 {
 public:
 	virtual void Display() = 0;
-	virtual void Reset() = 0;
+	virtual void Reset() {}
 	virtual ~ImguiItem() = default;
 };

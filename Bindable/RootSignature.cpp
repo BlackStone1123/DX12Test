@@ -24,8 +24,11 @@ RootSignature::RootSignature(Graphics& gfx)
 	CD3DX12_ROOT_PARAMETER1 rootParameters[2];
 	rootParameters[0].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 
-	CD3DX12_DESCRIPTOR_RANGE1 descriptorRage(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
-	rootParameters[1].InitAsDescriptorTable(1, &descriptorRage, D3D12_SHADER_VISIBILITY_PIXEL);
+	CD3DX12_DESCRIPTOR_RANGE1 descriptorRages[1];
+	descriptorRages[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+	//descriptorRages[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+
+	rootParameters[1].InitAsDescriptorTable(_countof(descriptorRages), descriptorRages, D3D12_SHADER_VISIBILITY_PIXEL);
 
 	CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;

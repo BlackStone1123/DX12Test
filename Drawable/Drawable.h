@@ -13,6 +13,9 @@ class Drawable
 	template<class T>
 	friend class DrawableBase;
 public:
+	using BindableList = std::vector<std::unique_ptr<Bindable>>;
+	using BufferList = std::vector<Buffer*>;
+
 	Drawable() = default;
 	Drawable( const Drawable& ) = delete;
 	virtual ~Drawable();
@@ -26,10 +29,10 @@ public:
 	void AddBuffer(Buffer*);
 
 private:
-	virtual const std::vector<std::unique_ptr<Bindable>>& GetStaticBinds() const = 0;
+	virtual const BindableList& GetStaticBinds() const = 0;
 
 private:
 	const IndexBuffer* pIndexBuffer{ nullptr };
-	std::vector<std::unique_ptr<Bindable>> binds;
-	std::vector<Buffer*> buffers;
+	BindableList binds;
+	BufferList buffers;
 };

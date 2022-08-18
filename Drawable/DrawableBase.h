@@ -37,14 +37,14 @@ public:
 	}
 
 private:
-	virtual const std::vector<std::unique_ptr<Bindable>>& GetStaticBinds() const override
+	virtual const BindableList& GetStaticBinds() const override
 	{
 		return staticBinds;
 	}
 
 private:
-	static std::vector<std::unique_ptr<Bindable>> staticBinds;
+	static BindableList staticBinds;
 };
 
 template<class T>
-std::vector<std::unique_ptr<Bindable>> DrawableBase<T>::staticBinds = {};
+Drawable::BindableList DrawableBase<T>::staticBinds = {};

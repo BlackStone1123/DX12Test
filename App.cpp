@@ -5,6 +5,7 @@
 #include "imgui.h"
 #include "ImguiManager.h"
 #include "Camera.h"
+#include "Projector.h"
 
 App::App(HINSTANCE hIns, int width, int height)
 	: mImguiManager(std::make_unique<ImguiManager>())
@@ -15,7 +16,7 @@ App::App(HINSTANCE hIns, int width, int height)
 	std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
 	std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
 	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
-	for (auto i = 0; i < 30; i++)
+	for (auto i = 0; i < 20; i++)
 	{
 		boxes.push_back(std::make_unique<Box>(
 			*mWnd->Gfx(), rng, adist,

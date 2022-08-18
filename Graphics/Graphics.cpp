@@ -5,6 +5,7 @@
 #include "imgui_impl_win32.h"
 #include "Bindable.h"
 #include "Camera.h"
+#include "Projector.h"
 
 Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     : mWidth(width)
@@ -108,6 +109,7 @@ void Graphics::BeginFrame(float r, float g, float b, float a)
 void Graphics::EndFrame()
 {
     auto commandList = GetDrawCommandList();
+    commandList->SetGraphicsRootDescriptorTable(1, mSRVGpuHandle);
 
     ImGui::Render();
     ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
@@ -238,14 +240,19 @@ DirectX::XMMATRIX Graphics::GetViewMatrix() const
 
 void Graphics::AddCamera(std::unique_ptr<Camera> cam)
 {
-    mCamera = cam.get();
-    mImguiItems.push_back(std::move(cam));
+    mImguiItems.push_back(cam.get());
+    mCamera = std::move(cam);
 }
 
 void Graphics::AddProjector(std::unique_ptr<Projector> proj)
 {
-    mProj = proj.get();
-    mImguiItems.push_back(std::move(proj));
+    mImguiItems.push_back(proj.get());
+    mProj = std::move(proj);
+}
+
+void Graphics::AddImguiItem(ImguiItem* item)
+{
+    mImguiItems.push_back(item);
 }
 
 void Graphics::ShowImguiItems()
@@ -256,10 +263,9 @@ void Graphics::ShowImguiItems()
     }
 }
 
-std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> Graphics::AllocHeap()
+std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, UINT> Graphics::AllocHeap(UINT count)
 {
-    auto res = std::make_pair(mSRVCpuHandle, mSRVGpuHandle );
-    mSRVCpuHandle.Offset(mSRVDescriptorSize);
-    mSRVGpuHandle.Offset(mSRVDescriptorSize);
+    auto res = std::make_pair(mSRVCpuHandle, mSRVDescriptorSize);
+    mSRVCpuHandle.Offset(count, mSRVDescriptorSize);
     return res;
 }

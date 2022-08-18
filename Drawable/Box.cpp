@@ -1,7 +1,7 @@
 #include "Box.h"
 #include "BindableBase.h"
 #include "Vertex.h"
-#include "Surface.h"
+#include "Material.h"
 
 using namespace DirectX;
 
@@ -66,7 +66,12 @@ Box::Box( Graphics& gfx,
 		auto pso = std::make_unique<PiplineStateObject>(gfx, ied, sig->GetSignature(), pvs->GetBytecode(), pps->GetBytecode());
 		AddStaticBind(std::move(sig));
 		AddStaticBind(std::move(pso));
-		AddStaticBind(std::make_unique<Surface>(gfx, L"kappa50.png", true));
+
+		auto mat = std::make_unique<Material>(gfx);
+		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/Mona_Lisa.jpg", true));
+		//mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/kappa50.png", true));
+		AddStaticBind(std::move(mat));
+		//AddStaticBind(std::move(std::make_unique<ChangeIndex>(gfx)));
 	}
 	else
 	{

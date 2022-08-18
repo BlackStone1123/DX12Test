@@ -28,11 +28,13 @@ public:
 
 	DirectX::XMMATRIX GetProjection() const;
 	DirectX::XMMATRIX GetViewMatrix() const;
+
 	void AddCamera(std::unique_ptr<Camera> cam);
 	void AddProjector(std::unique_ptr<Projector> proj);
+	void AddImguiItem(ImguiItem*);
 
 	void ShowImguiItems();
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> AllocHeap();
+	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, UINT> AllocHeap(UINT count);
 
 private:
 	void Flush();
@@ -79,7 +81,7 @@ private:
 	bool mTearingSupported{ false };
 
 	// Imgui Items
-	std::vector<std::unique_ptr<ImguiItem>> mImguiItems;
-	Camera* mCamera{ nullptr };
-	Projector* mProj{ nullptr };
+	std::vector<ImguiItem*> mImguiItems;
+	std::unique_ptr<Camera> mCamera{ nullptr };
+	std::unique_ptr<Projector> mProj{ nullptr };
 };
