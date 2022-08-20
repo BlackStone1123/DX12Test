@@ -1,7 +1,8 @@
 #include "RootSignature.h"
 #include "GraphicContext.h"
 
-RootSignature::RootSignature(Graphics& gfx)
+RootSignature::RootSignature(Graphics& gfx, std::unique_ptr<SignatureNode> root)
+	: mRoot(std::move(root))
 {
 	// Create a root signature.
 	D3D12_FEATURE_DATA_ROOT_SIGNATURE featureData = {};
@@ -13,6 +14,54 @@ RootSignature::RootSignature(Graphics& gfx)
 		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 	}
 
+	std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters;
+	std::vector<std::vector<CD3DX12_DESCRIPTOR_RANGE1>> parameterTableRanges;
+
+	rootParameters.resize(mRoot->Count());
+
+	UINT index = 0;
+	for (auto& param : mRoot->GetSubNodes())
+	{
+		if (param->GetType() == ParameterType::Constant)
+		{
+			rootParameters[index].InitAsConstants(param->GetNumDescriptor(), param->GetBaseRegister());
+		}
+		else if (param->GetType() == ParameterType::TABLE)
+		{
+			std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRages;
+			descriptorRages.resize(param->Count());
+
+			UINT rangeIndex = 0;
+			for (auto& range : param->GetSubNodes())
+			{
+				D3D12_DESCRIPTOR_RANGE_TYPE rangeType;
+				switch (range->GetType())
+				{
+				case ParameterType::CBV:
+					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+					break;
+				case ParameterType::SRV:
+					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+					break;
+				case ParameterType::UAV:
+					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+					break;
+				case ParameterType::SAMPLER:
+					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
+					break;
+				default:
+					throw std::exception();
+				}
+				descriptorRages[rangeIndex].Init(rangeType, range->GetNumDescriptor(), range->GetBaseRegister());
+				rangeIndex++;
+			}
+			parameterTableRanges.push_back(descriptorRages);
+			rootParameters[index].InitAsDescriptorTable((UINT)descriptorRages.size(), parameterTableRanges.back().data(), D3D12_SHADER_VISIBILITY_PIXEL);
+		}
+		index++;
+	}
+
+	CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 	// Allow input layout and deny unnecessary access to certain pipeline stages.
 	D3D12_ROOT_SIGNATURE_FLAGS rootSignatureFlags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
@@ -20,19 +69,8 @@ RootSignature::RootSignature(Graphics& gfx)
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
-	// A single 32-bit constant root parameter that is used by the vertex shader.
-	CD3DX12_ROOT_PARAMETER1 rootParameters[2];
-	rootParameters[0].InitAsConstants(sizeof(DirectX::XMMATRIX) / 4, 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-
-	CD3DX12_DESCRIPTOR_RANGE1 descriptorRages[2];
-	descriptorRages[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0);
-	descriptorRages[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-
-	rootParameters[1].InitAsDescriptorTable(_countof(descriptorRages), descriptorRages, D3D12_SHADER_VISIBILITY_PIXEL);
-
-	CD3DX12_STATIC_SAMPLER_DESC linearRepeatSampler(0, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
-	rootSignatureDescription.Init_1_1(_countof(rootParameters), rootParameters, 1, &linearRepeatSampler, rootSignatureFlags);
+	rootSignatureDescription.Init_1_1((UINT)rootParameters.size(), rootParameters.data(), 1, &linearRepeatSampler, rootSignatureFlags);
 
 	// Serialize the root signature.
 	ComPtr<ID3DBlob> rootSignatureBlob;

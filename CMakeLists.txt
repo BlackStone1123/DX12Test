@@ -20,6 +20,7 @@ file(GLOB_RECURSE GraphicsHeaders Graphics/*.h)
 file(GLOB_RECURSE GraphicsSource Graphics/*.cpp)
 file(GLOB_RECURSE ImGuiHeaders ImGui/*.h)
 file(GLOB_RECURSE ImGuiSource ImGui/*.cpp)
+file(GLOB_RECURSE GeometrySource Drawable/Geometry/*)
 
 set( SHADER_FILES
     shaders/VertexShader.hlsl
@@ -33,6 +34,7 @@ source_group("Bindable" FILES ${BindableHeaders} ${BindableSource})
 source_group("Graphics" FILES ${GraphicsHeaders} ${GraphicsSource})
 source_group("ImGui" FILES ${ImGuiHeaders} ${ImGuiSource})
 source_group("Resources\\Shaders" FILES ${SHADER_FILES} )
+source_group("Geometry" FILES ${GeometrySource})
 
 set_source_files_properties( ${SHADER_FILES} 
     PROPERTIES

@@ -50,7 +50,7 @@ int App::exec()
 			gfx->BeginFrame(0.4f, 0.6f, 0.9f, 1.0f);
 			for (int i = 0; i < boxes.size(); i++)
 			{
-				boxes[i]->Update(*gfx, dt);
+				boxes[i]->Update(dt);
 				boxes[i]->Draw(*gfx);
 			}
 

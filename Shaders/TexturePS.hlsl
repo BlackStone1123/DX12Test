@@ -1,4 +1,4 @@
-cbuffer SceneConstantBuffer : register(b0)
+cbuffer SceneConstantBuffer : register(b1)
 {
     int index;
     float padding[63];

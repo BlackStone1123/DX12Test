@@ -8,7 +8,8 @@ public:
 	Surface(const std::wstring& filename, bool sRGB);
 	virtual ~Surface();
 
-	void Upload(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	void Upload(Graphics& gfx);
+	void Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 private:
 	ComPtr<ID3D12Resource> mIntermediateBuffer;
 	ComPtr<ID3D12Resource> mTexureBuffer;
@@ -19,7 +20,7 @@ class Material : public Bindable
 			   , public Buffer
 {
 public:
-	Material(Graphics& gfx);
+	Material(Graphics& gfx, UINT texCount);
 	virtual ~Material();
 
 	void AddTexture(std::unique_ptr<Surface>);

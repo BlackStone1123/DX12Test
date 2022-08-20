@@ -24,6 +24,13 @@ Box::Box( Graphics& gfx,
 {
 	if( !IsStaticInitialized() )
 	{
+		struct Vertex
+		{
+			DirectX::XMFLOAT3 pos;
+			DirectX::XMFLOAT3 color;
+			DirectX::XMFLOAT2 tex;
+		};
+
 		const std::vector<Vertex> vertices =
 		{
 			{ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), {0.0f,1.0f} }, // 0
@@ -62,12 +69,19 @@ Box::Box( Graphics& gfx,
 			{ "TexCoord",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 }
 		};
 		
-		auto sig = std::make_unique<RootSignature>(gfx);
+		auto root = std::make_unique<SignatureNode>();
+		root->AddSubNode()->SetType(ParameterType::Constant)->SetNumDescriptor(sizeof(DirectX::XMMATRIX) / 4)->SetBaseRegister(0);
+
+		auto tableNode = root->AddSubNode()->SetType(ParameterType::TABLE);
+		tableNode->AddSubNode()->SetType(ParameterType::SRV)->SetNumDescriptor(2)->SetBaseRegister(0);
+		tableNode->AddSubNode()->SetType(ParameterType::CBV)->SetNumDescriptor(1)->SetBaseRegister(1);
+
+		auto sig = std::make_unique<RootSignature>(gfx, std::move(root));
 		auto pso = std::make_unique<PiplineStateObject>(gfx, ied, sig->GetSignature(), pvs->GetBytecode(), pps->GetBytecode());
 		AddStaticBind(std::move(sig));
 		AddStaticBind(std::move(pso));
 
-		auto mat = std::make_unique<Material>(gfx);
+		auto mat = std::make_unique<Material>(gfx, 2);
 		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/Mona_Lisa.jpg", true));
 		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/kappa50.png", true));
 		AddStaticBind(std::move(mat));
@@ -86,7 +100,7 @@ Box::~Box()
 
 }
 
-void Box::Update(Graphics& gfx, float dt )
+void Box::Update(float dt )
 {
 	roll += droll * dt;
 	pitch += dpitch * dt;

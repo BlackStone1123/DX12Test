@@ -12,7 +12,7 @@ public:
 		std::uniform_real_distribution<float>& rdist );
 	virtual ~Box();
 
-	void Update(Graphics&, float dt ) override;
+	void Update(float dt ) override;
 	DirectX::XMMATRIX GetTransformXM() const override;
 private:
 	// positional

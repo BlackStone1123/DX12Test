@@ -21,7 +21,7 @@ public:
 	virtual ~Drawable();
 
 	virtual DirectX::XMMATRIX GetTransformXM() const = 0;
-	virtual void Update(Graphics& ,float dt) = 0;
+	virtual void Update(float dt) = 0;
 
 	void Draw( Graphics& gfx );
 	void AddBind( std::unique_ptr<Bindable> bind );

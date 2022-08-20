@@ -23,7 +23,7 @@ Surface::~Surface()
 {
 }
 
-void Surface::Upload(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+void Surface::Upload(Graphics& gfx)
 {
     TexMetadata  metadata;
     ScratchImage scratchImage;
@@ -75,15 +75,6 @@ void Surface::Upload(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
         D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&mTexureBuffer)));
     mTexureBuffer->SetName(mFilename.data());
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
-    ZeroMemory(&srvDesc, sizeof(srvDesc));
-    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srvDesc.Texture2D.MipLevels = 1;
-    srvDesc.Texture2D.MostDetailedMip = 0;
-    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    d3d12Device->CreateShaderResourceView(mTexureBuffer.Get(), &srvDesc, handle);
-
     std::vector<D3D12_SUBRESOURCE_DATA> subresources(scratchImage.GetImageCount());
     const Image* pImages = scratchImage.GetImages();
     for (int i = 0; i < scratchImage.GetImageCount(); ++i)
@@ -103,9 +94,24 @@ void Surface::Upload(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
     );
 }
 
-Material::Material(Graphics& gfx)
+void Surface::Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
-    auto heapHandle = gfx.AllocHeap(2);
+    ComPtr<ID3D12Device2> d3d12Device = GraphicContext::GetDevice(gfx);
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    ZeroMemory(&srvDesc, sizeof(srvDesc));
+    srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+    d3d12Device->CreateShaderResourceView(mTexureBuffer.Get(), &srvDesc, handle);
+}
+
+Material::Material(Graphics& gfx, UINT texCount)
+{
+    auto heapHandle = gfx.AllocHeap(texCount);
     mCpuHandle = heapHandle.first;
     mSize = heapHandle.second;
 }
@@ -126,9 +132,12 @@ void Material::Bind(Graphics& gfx)
 
 void Material::Upload(Graphics& gfx)
 {
+    auto currentHandle = mCpuHandle;
+
     for (auto& tex : mTextures)
     {
-        tex->Upload(gfx, mCpuHandle);
-        mCpuHandle.Offset(mSize);
+        tex->Upload(gfx);
+        tex->Bind(gfx, currentHandle);
+        currentHandle.Offset(mSize);
     }
 }
