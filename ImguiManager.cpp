@@ -7,7 +7,7 @@ ImguiManager::ImguiManager()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGui::StyleColorsLight();
+	ImGui::StyleColorsDark();
 	ImGuiIO& io = ImGui::GetIO(); 
 	(void)io;
 }

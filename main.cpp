@@ -23,27 +23,6 @@ void ParseCommandLineArguments(int& clientWidth, int& clientHeight)
     ::LocalFree(argv);
 }
 
-//void Update()
-//{
-//    static uint64_t frameCounter = 0;
-//    static double elapsedSeconds = 0.0;
-//    static std::chrono::high_resolution_clock clock;
-//    static auto t0 = clock.now();
-//
-//    frameCounter++;
-//    auto t1 = clock.now();
-//    auto deltaTime = t1 - t0;
-//    t0 = t1;
-//    elapsedSeconds += deltaTime.count() * 1e-9;
-//    if (elapsedSeconds > 1.0)
-//    {
-//        std::cout << "FPS: " << frameCounter / elapsedSeconds << std::endl;
-//
-//        frameCounter = 0;
-//        elapsedSeconds = 0.0;
-//    }
-//}
-
 int CALLBACK wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow)
 {
     int clientWidth = 1200;

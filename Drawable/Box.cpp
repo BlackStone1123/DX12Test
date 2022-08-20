@@ -55,9 +55,6 @@ Box::Box( Graphics& gfx,
 			4, 0, 3, 4, 3, 7
 		};
 		AddStaticIndexBuffer( std::make_unique<IndexBuffer>( gfx,indices ) );
-
-		//AddStaticBind( std::make_unique<PixelConstantBuffer<ConstantBuffer2>>( gfx,cb2 ) );
-
 		AddStaticBind( std::make_unique<Topology>( gfx,D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST ) );
 
 		auto pvs = std::make_unique<Shader>(gfx, L"TextureVS.cso");
