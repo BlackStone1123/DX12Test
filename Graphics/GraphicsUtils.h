@@ -29,7 +29,9 @@ public:
 		ComPtr<ID3D12GraphicsCommandList2> commandList,
 		ID3D12Resource** pDestinationResource,
 		ID3D12Resource** pIntermediateResource,
-		size_t numElements, size_t elementSize, const void* bufferData,
+		size_t numElements, 
+		size_t elementSize, 
+		const void* bufferData,
 		D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE
 	);
 
@@ -38,8 +40,8 @@ public:
 		ComPtr<ID3D12GraphicsCommandList2> commandList,
 		ID3D12Resource* pDestinationResource,
 		ID3D12Resource** pIntermediateResource,
-		uint32_t firstSubresource,
-		uint32_t numSubresources,
+		UINT firstSubresource,
+		UINT numSubresources,
 		D3D12_SUBRESOURCE_DATA* subresourceData
 	);
 };

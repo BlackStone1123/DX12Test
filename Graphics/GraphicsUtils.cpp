@@ -273,8 +273,8 @@ void GraphicsUtils::CopyTextureSubresource(
     ComPtr<ID3D12GraphicsCommandList2> commandList,
     ID3D12Resource* pDestinationResource,
     ID3D12Resource** pIntermediateResource,
-    uint32_t firstSubresource,
-    uint32_t numSubresources,
+    UINT firstSubresource,
+    UINT numSubresources,
     D3D12_SUBRESOURCE_DATA* subresourceData
 )
 {

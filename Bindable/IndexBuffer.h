@@ -2,7 +2,7 @@
 #include "Bindable.h"
 
 class IndexBuffer : public Bindable
-				  , public Buffer
+				  , public Resource
 {
 public:
 	IndexBuffer( Graphics& gfx,const std::vector<unsigned short>& indices );

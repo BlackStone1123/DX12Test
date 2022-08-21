@@ -25,7 +25,7 @@ void Drawable::Draw( Graphics& gfx )
 	{
 		b->Bind(gfx);
 	}
-	gfx.DrawIndexed( pIndexBuffer->GetCount() );
+	gfx.DrawIndexed(pIndexBuffer->GetCount(), GetHeapResource().GetResourceLocation());
 }
 
 void Drawable::AddBind( std::unique_ptr<Bindable> bind )
@@ -41,7 +41,7 @@ void Drawable::AddIndexBuffer( std::unique_ptr<IndexBuffer> ibuf )
 	binds.push_back( std::move( ibuf ) );
 }
 
-void Drawable::AddBuffer(Buffer* buffer)
+void Drawable::AddResource(Resource* buffer)
 {
 	buffers.push_back(buffer);
 }

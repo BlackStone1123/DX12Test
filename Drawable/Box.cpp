@@ -78,11 +78,14 @@ Box::Box( Graphics& gfx,
 		AddStaticBind(std::move(sig));
 		AddStaticBind(std::move(pso));
 
-		auto mat = std::make_unique<Material>(gfx, 2);
-		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/Mona_Lisa.jpg", true));
-		mat->AddTexture(std::make_unique<Surface>( L"../../../Assets/Texture/kappa50.png", true));
+		HeapResource source = gfx.AllocResource(3);
+		SetHeapResource(source);
+
+		auto mat = std::make_unique<Material>(gfx, source.RequestResource(2));
+		mat->AddTexture(std::make_unique<Texture>( L"../../../Assets/Texture/Mona_Lisa.jpg", true));
+		mat->AddTexture(std::make_unique<Texture>( L"../../../Assets/Texture/kappa50.png", true));
 		AddStaticBind(std::move(mat));
-		AddStaticBind(std::move(std::make_unique<ChangeIndex>(gfx)));
+		AddStaticBind(std::move(std::make_unique<ChangeIndex>(gfx, source.RequestResource(1))));
 	}
 	else
 	{

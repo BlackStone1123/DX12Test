@@ -1,7 +1,6 @@
 #pragma once
 #include "DrawableBase.h"
 
-class Surface;
 class Box : public DrawableBase<Box>
 {
 public:
@@ -35,6 +34,4 @@ private:
 	float dz{1.0f};
 	float dx{0.5f};
 	float dy{0.0f};
-
-	std::unique_ptr<Surface> mSurface;
 };

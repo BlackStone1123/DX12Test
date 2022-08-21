@@ -2,6 +2,7 @@
 
 #include "Helpers.h"
 #include "CommonHeaders.h"
+#include "HeapAllocation.h"
 
 // STD header files
 #include <vector>
@@ -24,7 +25,7 @@ public:
 	void BeginFrame(float r, float g, float b, float a = 1.0f);
 	void EndFrame();
 	void Resize(UINT width, UINT height);
-	void DrawIndexed(UINT count);
+	void DrawIndexed(UINT count, D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 	DirectX::XMMATRIX GetProjection() const;
 	DirectX::XMMATRIX GetViewMatrix() const;
@@ -34,7 +35,7 @@ public:
 	void AddImguiItem(ImguiItem*);
 
 	void ShowImguiItems();
-	std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, UINT> AllocHeap(UINT count);
+	HeapResource AllocResource(UINT count);
 
 private:
 	void Flush();

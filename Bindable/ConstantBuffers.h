@@ -8,9 +8,8 @@ template<typename C>
 class ConstantBuffer
 {
 public:
-	ConstantBuffer( Graphics& gfx,const C& consts )
+	ConstantBuffer( Graphics& gfx,const C& consts , D3D12_CPU_DESCRIPTOR_HANDLE handle)
 	{
-		auto handle = gfx.AllocHeap(1);
 		auto device = GraphicContext::GetDevice(gfx);
 
 		const UINT constantBufferSize = sizeof(C);    // CB size is required to be 256-byte aligned.
@@ -27,7 +26,7 @@ public:
 		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
 		cbvDesc.BufferLocation = mConstantBuffer->GetGPUVirtualAddress();
 		cbvDesc.SizeInBytes = constantBufferSize;
-		device->CreateConstantBufferView(&cbvDesc, handle.first);
+		device->CreateConstantBufferView(&cbvDesc, handle);
 
 		// Map and initialize the constant buffer. We don't unmap this until the
 		// app closes. Keeping things mapped for the lifetime of the resource is okay.
@@ -49,7 +48,8 @@ protected:
 class ChangeIndex : public Bindable, public ImguiItem
 {
 public:
-	ChangeIndex(Graphics& gfx): mCBuf(gfx, mIndex)
+	ChangeIndex(Graphics& gfx,const HeapAllocation& location)
+		: mCBuf(gfx, mIndex, location.cpuHandle)
 	{
 		gfx.AddImguiItem(this);
 	}

@@ -32,7 +32,7 @@ void IndexBuffer::Upload(Graphics& gfx)
     // Create index buffer view.
     m_IndexBufferView.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress();
     m_IndexBufferView.Format = DXGI_FORMAT_R16_UINT;
-    m_IndexBufferView.SizeInBytes = m_Indices.size() * sizeof(UINT16);
+    m_IndexBufferView.SizeInBytes = (UINT)m_Indices.size() * sizeof(UINT16);
 }
 
 UINT IndexBuffer::GetCount() const

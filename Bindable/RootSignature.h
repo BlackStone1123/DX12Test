@@ -28,7 +28,7 @@ public:
 	ParameterType GetType() const { return mType; }
 	SignatureNode* SetType(ParameterType type) { mType = type; return this; }
 
-	UINT Count() const { return mChildren.size(); }
+	UINT Count() const { return (UINT)mChildren.size(); }
 	SignatureNode* AddSubNode() 
 	{
 		auto newNode = std::make_unique<SignatureNode>();

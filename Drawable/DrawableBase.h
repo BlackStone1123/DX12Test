@@ -12,16 +12,16 @@ public:
 	}
 	void AddStaticBind( std::unique_ptr<Bindable> bind )
 	{
-		if (auto buffer = dynamic_cast<Buffer*>(bind.get()))
+		if (auto buffer = dynamic_cast<Resource*>(bind.get()))
 		{
-			AddBuffer(buffer);
+			AddResource(buffer);
 		}
 		staticBinds.push_back( std::move( bind ) );
 	}
 	void AddStaticIndexBuffer( std::unique_ptr<IndexBuffer> ibuf )
 	{
 		pIndexBuffer = ibuf.get();
-		AddBuffer(ibuf.get());
+		AddResource(ibuf.get());
 		staticBinds.push_back( std::move( ibuf ) );
 	}
 	void SetIndexFromStatic()
@@ -35,16 +35,28 @@ public:
 			}
 		}
 	}
-
+	void SetHeapResource(const HeapResource& location)
+	{
+		heapResource = location;
+	}
 private:
 	virtual const BindableList& GetStaticBinds() const override
 	{
 		return staticBinds;
 	}
 
+	virtual HeapResource GetHeapResource() const override
+	{
+		return heapResource;
+	}
+
 private:
 	static BindableList staticBinds;
+	static HeapResource heapResource;
 };
 
 template<class T>
 Drawable::BindableList DrawableBase<T>::staticBinds = {};
+
+template<class T>
+HeapResource DrawableBase<T>::heapResource = {};

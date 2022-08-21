@@ -1,6 +1,7 @@
 #pragma once
 #include "CommonHeaders.h"
 #include "Helpers.h"
+#include "HeapAllocation.h"
 
 class Graphics;
 class Bindable
@@ -10,11 +11,11 @@ public:
 	virtual ~Bindable() = default;
 };
 
-class Buffer
+class Resource
 {
 public:
 	virtual void Upload(Graphics& gfx) = 0;
-	virtual ~Buffer() = default;
+	virtual ~Resource() = default;
 };
 
 class ImguiItem

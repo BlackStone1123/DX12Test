@@ -10,7 +10,7 @@
 namespace fs = std::filesystem;
 using namespace DirectX;
 
-Surface::Surface(const std::wstring& fileName, bool sRGB)
+Texture::Texture(const std::wstring& fileName, bool sRGB)
     :mFilename(fileName)
 {
     if (!fs::exists(fs::path(fileName)))
@@ -19,11 +19,11 @@ Surface::Surface(const std::wstring& fileName, bool sRGB)
     }
 }
 
-Surface::~Surface()
+Texture::~Texture()
 {
 }
 
-void Surface::Upload(Graphics& gfx)
+void Texture::Upload(Graphics& gfx)
 {
     TexMetadata  metadata;
     ScratchImage scratchImage;
@@ -90,11 +90,11 @@ void Surface::Upload(Graphics& gfx)
         GraphicContext::GetCopyCommandList(gfx),
         mTexureBuffer.Get(),
         mIntermediateBuffer.GetAddressOf(),
-        0, subresources.size(), subresources.data()
+        0, (UINT)subresources.size(), subresources.data()
     );
 }
 
-void Surface::Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+void Texture::Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
     ComPtr<ID3D12Device2> d3d12Device = GraphicContext::GetDevice(gfx);
 
@@ -109,11 +109,9 @@ void Surface::Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
     d3d12Device->CreateShaderResourceView(mTexureBuffer.Get(), &srvDesc, handle);
 }
 
-Material::Material(Graphics& gfx, UINT texCount)
+Material::Material(Graphics& gfx,const HeapAllocation& location)
+    :mLocation(location)
 {
-    auto heapHandle = gfx.AllocHeap(texCount);
-    mCpuHandle = heapHandle.first;
-    mSize = heapHandle.second;
 }
 
 Material::~Material()
@@ -121,7 +119,7 @@ Material::~Material()
 
 }
 
-void Material::AddTexture(std::unique_ptr<Surface> sur)
+void Material::AddTexture(std::unique_ptr<Texture> sur)
 {
     mTextures.push_back(std::move(sur));
 }
@@ -132,12 +130,12 @@ void Material::Bind(Graphics& gfx)
 
 void Material::Upload(Graphics& gfx)
 {
-    auto currentHandle = mCpuHandle;
+    auto currentHandle = mLocation;
 
     for (auto& tex : mTextures)
     {
         tex->Upload(gfx);
-        tex->Bind(gfx, currentHandle);
-        currentHandle.Offset(mSize);
+        tex->Bind(gfx, currentHandle.cpuHandle);
+        currentHandle++;
     }
 }

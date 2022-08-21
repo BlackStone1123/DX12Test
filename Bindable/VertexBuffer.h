@@ -6,7 +6,7 @@
 
 template<typename V>
 class VertexBuffer : public Bindable
-	               , public Buffer
+	               , public Resource
 {
 public:
 	VertexBuffer(Graphics& gfx, const std::vector<V>& vertices)
@@ -36,7 +36,7 @@ public:
 
 		// Create the vertex buffer view.
 		m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
-		m_VertexBufferView.SizeInBytes = m_Vertices.size() * stride;
+		m_VertexBufferView.SizeInBytes = (UINT)m_Vertices.size() * stride;
 		m_VertexBufferView.StrideInBytes = stride;
 	}
 

@@ -60,7 +60,7 @@ void Graphics::UpdateRenderTargetViews(UINT frameCount)
 
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(mRTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
-    for (size_t i = 0; i < frameCount; ++i)
+    for (UINT i = 0; i < frameCount; ++i)
     {
         ComPtr<ID3D12Resource> backBuffer;
         ThrowIfFailed(mSwapChain->GetBuffer(i, IID_PPV_ARGS(&backBuffer)));
@@ -181,7 +181,7 @@ void Graphics::ResizeDepthBuffer()
 
 void Graphics::ResizeRenderTarget()
 {
-    for (int i = 0; i < mNumFrames; ++i)
+    for (UINT i = 0; i < mNumFrames; ++i)
     {
         mBackBuffers[i].Reset();
     }
@@ -195,9 +195,9 @@ void Graphics::ResizeRenderTarget()
     UpdateRenderTargetViews(mNumFrames);
 }
 
-void Graphics::DrawIndexed(UINT count)
+void Graphics::DrawIndexed(UINT count, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
 {
-    GetDrawCommandList()->SetGraphicsRootDescriptorTable(1, mSRVGpuHandle);
+    GetDrawCommandList()->SetGraphicsRootDescriptorTable(1, gpuHandle);
     GetDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
 }
 
@@ -263,9 +263,10 @@ void Graphics::ShowImguiItems()
     }
 }
 
-std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, UINT> Graphics::AllocHeap(UINT count)
+HeapResource Graphics::AllocResource(UINT count)
 {
-    auto res = std::make_pair(mSRVCpuHandle, mSRVDescriptorSize);
+    HeapResource res = { mSRVCpuHandle, mSRVGpuHandle, mSRVDescriptorSize, count };
     mSRVCpuHandle.Offset(count, mSRVDescriptorSize);
+    mSRVGpuHandle.Offset(count, mSRVDescriptorSize);
     return res;
 }

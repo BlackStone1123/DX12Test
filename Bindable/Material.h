@@ -2,11 +2,11 @@
 #include "Helpers.h"
 #include "Bindable.h"
 
-class Surface
+class Texture
 {
 public:
-	Surface(const std::wstring& filename, bool sRGB);
-	virtual ~Surface();
+	Texture(const std::wstring& filename, bool sRGB);
+	virtual ~Texture();
 
 	void Upload(Graphics& gfx);
 	void Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle);
@@ -17,19 +17,17 @@ private:
 };
 
 class Material : public Bindable
-			   , public Buffer
+			   , public Resource
 {
 public:
-	Material(Graphics& gfx, UINT texCount);
+	Material(Graphics& gfx,const HeapAllocation& location);
 	virtual ~Material();
 
-	void AddTexture(std::unique_ptr<Surface>);
+	void AddTexture(std::unique_ptr<Texture>);
 	virtual void Bind(Graphics& gfx) override;
 	virtual void Upload(Graphics& gfx) override;
 
 private:
-	std::vector<std::unique_ptr<Surface>> mTextures;
-	CD3DX12_CPU_DESCRIPTOR_HANDLE mCpuHandle;
-	UINT mSize;
-	UINT mCurrentTex{ 0 };
+	std::vector<std::unique_ptr<Texture>> mTextures;
+	HeapAllocation mLocation;
 };
