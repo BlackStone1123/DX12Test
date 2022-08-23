@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "Window.h"
 #include "Box.h"
+#include "SolidSphere.h"
 #include "imgui.h"
 #include "ImguiManager.h"
 #include "Camera.h"
@@ -18,11 +19,13 @@ App::App(HINSTANCE hIns, int width, int height)
 	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
 	for (auto i = 0; i < 20; i++)
 	{
-		boxes.push_back(std::make_unique<Box>(
+		mDrawables.push_back(std::make_unique<Box>(
 			*mWnd->Gfx(), rng, adist,
 			ddist, odist, rdist
 			));
 	}
+	mDrawables.push_back(std::make_unique<SolidSphere>(*mWnd->Gfx(), 0.2f, DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f)));
+
 	mWnd->Gfx()->AddCamera(std::make_unique<Camera>());
 	mWnd->Gfx()->AddProjector(std::make_unique<Projector>(width, height));
 }
@@ -48,10 +51,10 @@ int App::exec()
 			const auto dt = mTimer.Mark() * mSpeedFactor;
 
 			gfx->BeginFrame(0.4f, 0.6f, 0.9f, 1.0f);
-			for (int i = 0; i < boxes.size(); i++)
+			for (int i = 0; i < mDrawables.size(); i++)
 			{
-				boxes[i]->Update(dt);
-				boxes[i]->Draw(*gfx);
+				mDrawables[i]->Update(dt);
+				mDrawables[i]->Draw(*gfx);
 			}
 
 			//static bool showDemo = false;

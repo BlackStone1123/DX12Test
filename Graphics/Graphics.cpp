@@ -197,7 +197,10 @@ void Graphics::ResizeRenderTarget()
 
 void Graphics::DrawIndexed(UINT count, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
 {
-    GetDrawCommandList()->SetGraphicsRootDescriptorTable(1, gpuHandle);
+    if (gpuHandle.ptr)
+    {
+        GetDrawCommandList()->SetGraphicsRootDescriptorTable(1, gpuHandle);
+    }
     GetDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
 }
 

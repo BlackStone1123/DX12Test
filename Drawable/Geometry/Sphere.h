@@ -1,6 +1,5 @@
 #pragma once
 #include "Vertex.h"
-#include <DirectXMath.h>
 
 class Sphere
 {
@@ -14,8 +13,8 @@ public:
 
 		constexpr float radius = 1.0f;
 		const auto base = dx::XMVectorSet( 0.0f,0.0f,radius,0.0f );
-		const float lattitudeAngle = PI / latDiv;
-		const float longitudeAngle = 2.0f * PI / longDiv;
+		const float lattitudeAngle = static_cast<float>( M_PI / latDiv);
+		const float longitudeAngle = static_cast <float>(2.0f * M_PI / longDiv);
 
 		std::vector<V> vertices;
 		for( int iLat = 1; iLat < latDiv; iLat++ )

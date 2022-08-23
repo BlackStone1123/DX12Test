@@ -9,7 +9,10 @@ RootSignature::RootSignature(Graphics& gfx, std::unique_ptr<SignatureNode> root)
 	featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_1;
 
 	auto device = GraphicContext::GetDevice(gfx);
-	if (FAILED(device->CheckFeatureSupport(D3D12_FEATURE_ROOT_SIGNATURE, &featureData, sizeof(featureData))))
+	if (FAILED(device->CheckFeatureSupport(
+		D3D12_FEATURE_ROOT_SIGNATURE, 
+		&featureData, 
+		sizeof(featureData))))
 	{
 		featureData.HighestVersion = D3D_ROOT_SIGNATURE_VERSION_1_0;
 	}
@@ -24,7 +27,7 @@ RootSignature::RootSignature(Graphics& gfx, std::unique_ptr<SignatureNode> root)
 	{
 		if (param->GetType() == ParameterType::Constant)
 		{
-			rootParameters[index].InitAsConstants(param->GetNumDescriptor(), param->GetBaseRegister());
+			rootParameters[index].InitAsConstants(param->GetNumDescriptor(), param->GetBaseRegister(), 0, param->GetVisibility());
 		}
 		else if (param->GetType() == ParameterType::TABLE)
 		{
@@ -56,7 +59,7 @@ RootSignature::RootSignature(Graphics& gfx, std::unique_ptr<SignatureNode> root)
 				rangeIndex++;
 			}
 			parameterTableRanges.push_back(descriptorRages);
-			rootParameters[index].InitAsDescriptorTable((UINT)descriptorRages.size(), parameterTableRanges.back().data(), D3D12_SHADER_VISIBILITY_PIXEL);
+			rootParameters[index].InitAsDescriptorTable((UINT)descriptorRages.size(), parameterTableRanges.back().data(), param->GetVisibility());
 		}
 		index++;
 	}
@@ -70,16 +73,28 @@ RootSignature::RootSignature(Graphics& gfx, std::unique_ptr<SignatureNode> root)
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDescription;
-	rootSignatureDescription.Init_1_1((UINT)rootParameters.size(), rootParameters.data(), 1, &linearRepeatSampler, rootSignatureFlags);
+	rootSignatureDescription.Init_1_1(
+		(UINT)rootParameters.size(),
+		rootParameters.data(), 
+		1, 
+		&linearRepeatSampler, 
+		rootSignatureFlags);
 
 	// Serialize the root signature.
 	ComPtr<ID3DBlob> rootSignatureBlob;
 	ComPtr<ID3DBlob> errorBlob;
-	ThrowIfFailed(D3DX12SerializeVersionedRootSignature(&rootSignatureDescription,
-		featureData.HighestVersion, &rootSignatureBlob, &errorBlob));
+	ThrowIfFailed(D3DX12SerializeVersionedRootSignature(
+		&rootSignatureDescription,
+		featureData.HighestVersion,
+		&rootSignatureBlob,
+		&errorBlob));
+
 	// Create the root signature.
-	ThrowIfFailed(device->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(),
-		rootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_RootSignature)));
+	ThrowIfFailed(device->CreateRootSignature(
+		0,
+		rootSignatureBlob->GetBufferPointer(),
+		rootSignatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&m_RootSignature)));
 }
 
 void RootSignature::Bind( Graphics& gfx )

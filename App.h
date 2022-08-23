@@ -5,7 +5,7 @@
 
 class Window;
 class ImguiManager;
-class Box;
+class Drawable;
 
 class App
 {
@@ -18,7 +18,8 @@ private:
 	std::unique_ptr<ImguiManager> mImguiManager;
 	std::unique_ptr<Window> mWnd;
 
-	std::vector<std::unique_ptr<Box>> boxes;
+	std::vector<std::unique_ptr<Drawable>> mDrawables;
+
 	ChiliTimer mTimer;
 	float mSpeedFactor = 1.0f;
 };

@@ -1,6 +1,9 @@
 #pragma once
 #include <DirectXMath.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 template<class T>
 class IndexedTriangleList
 {
@@ -12,6 +15,18 @@ public:
 	{
 		assert(vertices.size() > 2);
 		assert(indices.size() % 3 == 0);
+	}
+
+	void Transform(DirectX::FXMMATRIX& matrix)
+	{
+		for (auto& v : vertices)
+		{
+			const DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&v.pos);
+			DirectX::XMStoreFloat3(
+				&v.pos,
+				DirectX::XMVector3Transform(pos, matrix)
+			);
+		}
 	}
 
 public:

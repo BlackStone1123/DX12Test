@@ -28,6 +28,9 @@ public:
 	ParameterType GetType() const { return mType; }
 	SignatureNode* SetType(ParameterType type) { mType = type; return this; }
 
+	D3D12_SHADER_VISIBILITY GetVisibility() const { return mVisibility; }
+	SignatureNode* SetVisibility(D3D12_SHADER_VISIBILITY vis) { mVisibility = vis; return this; }
+
 	UINT Count() const { return (UINT)mChildren.size(); }
 	SignatureNode* AddSubNode() 
 	{
@@ -39,6 +42,8 @@ public:
 
 private:
 	ParameterType mType;
+	D3D12_SHADER_VISIBILITY mVisibility{ D3D12_SHADER_VISIBILITY_ALL };
+
 	UINT mNum{ 0 };
 	UINT mBase{ 0 };
 	SubNodeList mChildren;

@@ -27,6 +27,8 @@ set( SHADER_FILES
     shaders/PixelShader.hlsl
     shaders/TextureVS.hlsl
     shaders/TexturePS.hlsl
+    shaders/SolidVS.hlsl
+    shaders/SolidPS.hlsl
 )
 
 source_group("Drawable" FILES ${DrawableHeaders} ${DrawableSource})
@@ -46,12 +48,18 @@ set_source_files_properties( ${SHADER_FILES}
 )
 
 
-set_source_files_properties( shaders/VertexShader.hlsl shaders/TextureVS.hlsl
+set_source_files_properties( 
+    shaders/VertexShader.hlsl 
+    shaders/TextureVS.hlsl
+    shaders/SolidVS.hlsl
 PROPERTIES
     VS_SHADER_TYPE Vertex
 )
 
-set_source_files_properties( shaders/PixelShader.hlsl shaders/TexturePS.hlsl
+set_source_files_properties( 
+    shaders/PixelShader.hlsl 
+    shaders/TexturePS.hlsl
+    shaders/SolidPS.hlsl
 PROPERTIES
     VS_SHADER_TYPE Pixel
 )
