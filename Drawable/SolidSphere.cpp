@@ -5,6 +5,7 @@
 namespace dx = DirectX;
 
 SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& color)
+	: mRadius(radius)
 {
 	if( !IsStaticInitialized() )
 	{
@@ -13,7 +14,6 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& c
 			dx::XMFLOAT3 pos;
 		};
 		auto model = Sphere::Make<Vertex>();
-		model.Transform( dx::XMMatrixScaling( radius,radius,radius ) );
 
 		AddStaticBind( std::make_unique<VertexBuffer<Vertex>>( gfx,model.vertices ) );
 		AddStaticIndexBuffer( std::make_unique<IndexBuffer>( gfx,model.indices ) );
@@ -29,8 +29,7 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& c
 
 		auto root = std::make_unique<SignatureNode>();
 		root->AddSubNode()
-			->SetType(ParameterType::Constant)
-			->SetNumDescriptor(sizeof(DirectX::XMMATRIX) / 4)
+			->SetType(ParameterType::CBV)
 			->SetBaseRegister(0)
 		    ->SetVisibility(D3D12_SHADER_VISIBILITY_VERTEX);
 
@@ -51,7 +50,6 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& c
 
 		AddStaticBind(std::move(sig));
 		AddStaticBind(std::move(pso));
-		AddStaticBind(std::make_unique<ColorCbuf>(gfx, color, 1));
 	}
 	else
 	{
@@ -59,6 +57,7 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& c
 	}
 
 	AddBind( std::make_unique<TransformCbuf>( gfx,*this, 0) );
+	AddBind(std::make_unique<ColorCbuf>(gfx, color, 1));
 }
 
 void SolidSphere::Update( float dt ) {}
@@ -70,5 +69,7 @@ void SolidSphere::SetPos( DirectX::XMFLOAT3 pos )
 
 DirectX::XMMATRIX SolidSphere::GetTransformXM() const
 {
-	return DirectX::XMMatrixTranslation( pos.x,pos.y,pos.z );
+	auto scalingMatrix = dx::XMMatrixScaling(mRadius, mRadius, mRadius);
+	auto translationMatrix = dx::XMMatrixTranslation(pos.x, pos.y, pos.z);
+	return scalingMatrix * translationMatrix;
 }

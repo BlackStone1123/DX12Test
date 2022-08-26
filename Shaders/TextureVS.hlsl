@@ -1,6 +1,9 @@
-struct ModelViewProjection
+struct PositionMatrix
 {
-	matrix MVP;
+	matrix model;
+	matrix modelView;
+	matrix modelViewProj;
+	matrix InverseTransposeModelViewMatrix;
 };
 
 struct VSOut
@@ -9,12 +12,12 @@ struct VSOut
 	float4 pos : SV_Position;
 };
 
-ConstantBuffer<ModelViewProjection> modelViewProjectionCB: register(b0);
+ConstantBuffer<PositionMatrix> modelViewProjectionCB: register(b0);
 
-VSOut main( float3 pos : Position,float2 tex : TexCoord )
+VSOut main( float3 pos : POSITION,float2 tex : TEXCOORD )
 {
 	VSOut vso;
-	vso.pos = mul(modelViewProjectionCB.MVP, float4(pos, 1.0f)); 
+	vso.pos = mul(modelViewProjectionCB.modelViewProj, float4(pos, 1.0f));
 	vso.tex = tex;
 	return vso;
 }

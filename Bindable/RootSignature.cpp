@@ -18,48 +18,62 @@ RootSignature::RootSignature(Graphics& gfx, std::unique_ptr<SignatureNode> root)
 	}
 
 	std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters;
+	rootParameters.resize(mRoot->Count());
+
 	std::vector<std::vector<CD3DX12_DESCRIPTOR_RANGE1>> parameterTableRanges;
 
-	rootParameters.resize(mRoot->Count());
+	auto resolveTableParameters = [&parameterTableRanges, &rootParameters](const SignatureNode& tableNode, UINT index)
+	{
+		std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRages;
+		descriptorRages.resize(tableNode.Count());
+
+		UINT rangeIndex = 0;
+		for (auto& range : tableNode.GetSubNodes())
+		{
+			D3D12_DESCRIPTOR_RANGE_TYPE rangeType;
+			switch (range->GetType())
+			{
+			case ParameterType::CBV:
+				rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
+				break;
+			case ParameterType::SRV:
+				rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+				break;
+			case ParameterType::UAV:
+				rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+				break;
+			default:
+				throw std::exception();
+			}
+			descriptorRages[rangeIndex].Init(rangeType, range->GetNumDescriptor(), range->GetBaseRegister());
+			rangeIndex++;
+		}
+		parameterTableRanges.push_back(descriptorRages);
+		rootParameters[index].InitAsDescriptorTable((UINT)descriptorRages.size(), parameterTableRanges.back().data(), tableNode.GetVisibility());
+	};
 
 	UINT index = 0;
 	for (auto& param : mRoot->GetSubNodes())
 	{
-		if (param->GetType() == ParameterType::Constant)
+		switch (param->GetType())
 		{
+		case ParameterType::Constant:
 			rootParameters[index].InitAsConstants(param->GetNumDescriptor(), param->GetBaseRegister(), 0, param->GetVisibility());
-		}
-		else if (param->GetType() == ParameterType::TABLE)
-		{
-			std::vector<CD3DX12_DESCRIPTOR_RANGE1> descriptorRages;
-			descriptorRages.resize(param->Count());
-
-			UINT rangeIndex = 0;
-			for (auto& range : param->GetSubNodes())
-			{
-				D3D12_DESCRIPTOR_RANGE_TYPE rangeType;
-				switch (range->GetType())
-				{
-				case ParameterType::CBV:
-					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;
-					break;
-				case ParameterType::SRV:
-					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
-					break;
-				case ParameterType::UAV:
-					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
-					break;
-				case ParameterType::SAMPLER:
-					rangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER;
-					break;
-				default:
-					throw std::exception();
-				}
-				descriptorRages[rangeIndex].Init(rangeType, range->GetNumDescriptor(), range->GetBaseRegister());
-				rangeIndex++;
-			}
-			parameterTableRanges.push_back(descriptorRages);
-			rootParameters[index].InitAsDescriptorTable((UINT)descriptorRages.size(), parameterTableRanges.back().data(), param->GetVisibility());
+			break;
+		case ParameterType::CBV:
+			rootParameters[index].InitAsConstantBufferView(param->GetBaseRegister(), 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, param->GetVisibility());
+			break;
+		case ParameterType::SRV:
+			rootParameters[index].InitAsShaderResourceView(param->GetBaseRegister(), 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, param->GetVisibility());
+			break;
+		case ParameterType::UAV:
+			rootParameters[index].InitAsUnorderedAccessView(param->GetBaseRegister(), 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, param->GetVisibility());
+			break;
+		case ParameterType::TABLE:
+			resolveTableParameters(*param, index);
+			break;
+		default:
+			break;
 		}
 		index++;
 	}

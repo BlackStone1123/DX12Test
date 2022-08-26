@@ -12,4 +12,5 @@ public:
 
 private:
 	DirectX::XMFLOAT3 pos = { 0.0f,0.0f,0.0f };
+	float mRadius{ 0.01f };
 };

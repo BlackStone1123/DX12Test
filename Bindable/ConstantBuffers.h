@@ -3,77 +3,101 @@
 #include "Graphics.h"
 #include "GraphicContext.h"
 #include "imgui.h"
+#include <optional>
 
 template<typename C>
-class ConstantBuffer
+class RawConstantBuffer
 {
 public:
-	ConstantBuffer( Graphics& gfx,const C& consts , D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	RawConstantBuffer( Graphics& gfx,const C& consts)
+		:mBufferSize(sizeof(C))
 	{
 		auto device = GraphicContext::GetDevice(gfx);
-
-		const UINT constantBufferSize = sizeof(C);    // CB size is required to be 256-byte aligned.
 
 		ThrowIfFailed(device->CreateCommittedResource(
 			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer(constantBufferSize),
+			&CD3DX12_RESOURCE_DESC::Buffer(mBufferSize),
 			D3D12_RESOURCE_STATE_GENERIC_READ,
 			nullptr,
 			IID_PPV_ARGS(&mConstantBuffer)));
-
-		// Describe and create a constant buffer view.
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
-		cbvDesc.BufferLocation = mConstantBuffer->GetGPUVirtualAddress();
-		cbvDesc.SizeInBytes = constantBufferSize;
-		device->CreateConstantBufferView(&cbvDesc, handle);
 
 		// Map and initialize the constant buffer. We don't unmap this until the
 		// app closes. Keeping things mapped for the lifetime of the resource is okay.
 		CD3DX12_RANGE readRange(0, 0);        // We do not intend to read from this resource on the CPU.
 		ThrowIfFailed(mConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&m_pCbvDataBegin)));
-		memcpy(m_pCbvDataBegin, &consts, constantBufferSize);
+		memcpy(m_pCbvDataBegin, &consts, mBufferSize);
 	}
 
-	void Update(Graphics& gfx, const C& consts)
+	void CreateConstantBufferView(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	{
+		auto device = GraphicContext::GetDevice(gfx);
+
+		// Describe and create a constant buffer view.
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc = {};
+		cbvDesc.BufferLocation = mConstantBuffer->GetGPUVirtualAddress();
+		cbvDesc.SizeInBytes = mBufferSize;
+		device->CreateConstantBufferView(&cbvDesc, handle);
+	}
+
+	void Update(const C& consts)
 	{
 		memcpy(m_pCbvDataBegin, &consts, sizeof(consts));
+	}
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetBufferVirtualAddress() const
+	{
+		return mConstantBuffer->GetGPUVirtualAddress();
 	}
 
 protected:
 	ComPtr<ID3D12Resource> mConstantBuffer;
 	UINT8* m_pCbvDataBegin;
+	UINT mBufferSize{ 0 };
 };
 
-class ChangeIndex : public Bindable, public ImguiItem
+template<typename C>
+class ConstantBuffer : public Bindable
 {
 public:
-	ChangeIndex(Graphics& gfx,const HeapAllocation& location)
-		: mCBuf(gfx, mIndex, location.cpuHandle)
+	void SetBindSlot(UINT slot)
 	{
-		gfx.AddImguiItem(this);
+		mSlot = slot;
 	}
 
 	virtual void Bind(Graphics& gfx) override
 	{
-		mCBuf.Update(gfx, mIndex);
+		mCBuf.Update(mData);
+
+		if (mSlot.has_value())
+		{
+			GraphicContext::GetCommandList(gfx)->SetGraphicsRootConstantBufferView
+			(
+				mSlot.value(),
+				mCBuf.GetBufferVirtualAddress()
+			);
+		}
 	}
 
-	virtual void Display() override
+protected:
+	using Super = ConstantBuffer<C>;
+	ConstantBuffer(Graphics& gfx,const C& data, const HeapAllocation& location)
+		: mCBuf(gfx, data)
+		, mData(data)
 	{
-		if (ImGui::Begin("Projector"))
-		{
-			static bool check = true;
-			ImGui::Checkbox("checkbox", &check);
-			mIndex.index = check ? 0 : 1;
-		}
-		ImGui::End();
+		mCBuf.CreateConstantBufferView(gfx, location.cpuHandle);
 	}
-private:
-	struct CData
+
+	ConstantBuffer(Graphics& gfx,const C& data)
+		: mCBuf(gfx, data)
+		, mData(data)
 	{
-		UINT index{ 0 };
-		float padding[63];
-	} mIndex;
-	ConstantBuffer<CData> mCBuf;
+	}
+
+	C& GetRawData() { return mData; }
+
+private:
+	RawConstantBuffer<C> mCBuf;
+	std::optional<UINT> mSlot;
+	C mData;
 };

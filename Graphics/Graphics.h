@@ -12,6 +12,7 @@ class ImguiItem;
 class Camera;
 class Projector;
 class CommandQueue;
+class PointLight;
 
 class Graphics
 {
@@ -25,14 +26,16 @@ public:
 	void BeginFrame(float r, float g, float b, float a = 1.0f);
 	void EndFrame();
 	void Resize(UINT width, UINT height);
-	void DrawIndexed(UINT count, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	void DrawIndexed(UINT count,UINT heapSlot, D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 	DirectX::XMMATRIX GetProjection() const;
 	DirectX::XMMATRIX GetViewMatrix() const;
 
 	void AddCamera(std::unique_ptr<Camera> cam);
 	void AddProjector(std::unique_ptr<Projector> proj);
+	void AddPointLight(std::unique_ptr<PointLight> pointLight);
 	void AddImguiItem(ImguiItem*);
+	PointLight* GetPointLight() { return mPointLight.get(); }
 
 	void ShowImguiItems();
 	HeapResource AllocResource(UINT count);
@@ -85,4 +88,5 @@ private:
 	std::vector<ImguiItem*> mImguiItems;
 	std::unique_ptr<Camera> mCamera{ nullptr };
 	std::unique_ptr<Projector> mProj{ nullptr };
+	std::unique_ptr<PointLight> mPointLight{ nullptr };
 };

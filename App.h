@@ -6,7 +6,6 @@
 class Window;
 class ImguiManager;
 class Drawable;
-
 class App
 {
 public:

@@ -3,14 +3,21 @@
 #include "Drawable.h"
 #include <DirectXMath.h>
 
-class TransformCbuf : public Bindable
+struct TransformMat
+{
+	DirectX::XMMATRIX ModelMatrix;
+	DirectX::XMMATRIX ModelViewMatrix;
+	DirectX::XMMATRIX ModelViewProjectionMatrix;
+	DirectX::XMMATRIX InverseTransposeModelViewMatrix;
+};
+
+class TransformCbuf : public ConstantBuffer<TransformMat>
 {
 public:
 	TransformCbuf( Graphics& gfx,const Drawable& parent, UINT slot);
-	void Bind( Graphics& gfx ) override;
+	virtual void Bind( Graphics& gfx ) override;
 private:
 	const Drawable& parent;
-	UINT mSlot;
 };
 
 class ColorCbuf : public Bindable

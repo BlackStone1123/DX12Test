@@ -28,3 +28,12 @@ D3D12_GPU_DESCRIPTOR_HANDLE HeapResource::GetResourceLocation() const
 {
 	return mGpuHandle;
 }
+
+void HeapResource::SetBindSlot(UINT slot)
+{
+	mSlot = slot;
+}
+UINT HeapResource::GetBindSlot() const
+{
+	return mSlot;
+}

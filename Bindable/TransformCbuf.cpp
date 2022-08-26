@@ -2,14 +2,25 @@
 #include "GraphicContext.h"
 
 TransformCbuf::TransformCbuf( Graphics& gfx,const Drawable& parent, UINT slot )
-	: parent( parent )
-	, mSlot(slot)
-{}
+	: Super(gfx, TransformMat())
+	, parent( parent )
+{
+	SetBindSlot(slot);
+}
 
 void TransformCbuf::Bind( Graphics& gfx )
 {
-	auto matrix = parent.GetTransformXM() * gfx.GetViewMatrix() * gfx.GetProjection();
-	GraphicContext::GetCommandList(gfx)->SetGraphicsRoot32BitConstants(mSlot, sizeof(DirectX::XMMATRIX) / 4, &matrix, 0);
+	auto model = parent.GetTransformXM();
+	auto view = gfx.GetViewMatrix();
+	auto projection = gfx.GetProjection();
+
+	TransformMat& mat = GetRawData();
+	mat.ModelMatrix = model;
+	mat.ModelViewMatrix = model * view;
+	mat.InverseTransposeModelViewMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, mat.ModelViewMatrix));
+	mat.ModelViewProjectionMatrix = model * view * projection;
+
+	Super::Bind(gfx);
 }
 
 ColorCbuf::ColorCbuf(Graphics& gfx, const DirectX::XMFLOAT3& color, UINT slot)

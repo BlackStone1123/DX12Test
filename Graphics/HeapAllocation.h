@@ -27,9 +27,13 @@ public:
 	HeapAllocation RequestResource(UINT count);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetResourceLocation() const;
 
+	void SetBindSlot(UINT slot);
+	UINT GetBindSlot() const;
+
 private:
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mGpuHandle;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mCpuHandle;
 	UINT mEmptryEntrySize{ 0 };
-	UINT mEntrySize;
+	UINT mEntrySize{ 0 };
+	UINT mSlot{ 0 };
 };

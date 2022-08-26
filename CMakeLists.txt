@@ -23,12 +23,12 @@ file(GLOB_RECURSE ImGuiSource ImGui/*.cpp)
 file(GLOB_RECURSE GeometrySource Drawable/Geometry/*)
 
 set( SHADER_FILES
-    shaders/VertexShader.hlsl
-    shaders/PixelShader.hlsl
     shaders/TextureVS.hlsl
     shaders/TexturePS.hlsl
     shaders/SolidVS.hlsl
     shaders/SolidPS.hlsl
+    shaders/PhongVS.hlsl
+    shaders/PhongPS.hlsl
 )
 
 source_group("Drawable" FILES ${DrawableHeaders} ${DrawableSource})
@@ -49,17 +49,17 @@ set_source_files_properties( ${SHADER_FILES}
 
 
 set_source_files_properties( 
-    shaders/VertexShader.hlsl 
     shaders/TextureVS.hlsl
     shaders/SolidVS.hlsl
+    shaders/PhongVS.hlsl
 PROPERTIES
     VS_SHADER_TYPE Vertex
 )
 
 set_source_files_properties( 
-    shaders/PixelShader.hlsl 
     shaders/TexturePS.hlsl
     shaders/SolidPS.hlsl
+    shaders/PhongPS.hlsl
 PROPERTIES
     VS_SHADER_TYPE Pixel
 )

@@ -6,6 +6,7 @@
 #include "Bindable.h"
 #include "Camera.h"
 #include "Projector.h"
+#include "PointLight.h"
 
 Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     : mWidth(width)
@@ -195,11 +196,11 @@ void Graphics::ResizeRenderTarget()
     UpdateRenderTargetViews(mNumFrames);
 }
 
-void Graphics::DrawIndexed(UINT count, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
+void Graphics::DrawIndexed(UINT count,UINT heapSlot, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
 {
     if (gpuHandle.ptr)
     {
-        GetDrawCommandList()->SetGraphicsRootDescriptorTable(1, gpuHandle);
+        GetDrawCommandList()->SetGraphicsRootDescriptorTable(heapSlot, gpuHandle);
     }
     GetDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
 }
@@ -251,6 +252,12 @@ void Graphics::AddProjector(std::unique_ptr<Projector> proj)
 {
     mImguiItems.push_back(proj.get());
     mProj = std::move(proj);
+}
+
+void Graphics::AddPointLight(std::unique_ptr<PointLight> pointLight)
+{
+    mImguiItems.push_back(pointLight.get());
+    mPointLight = std::move(pointLight);
 }
 
 void Graphics::AddImguiItem(ImguiItem* item)
