@@ -62,7 +62,7 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& c
 
 void SolidSphere::Update( float dt ) {}
 
-void SolidSphere::SetPos( DirectX::XMFLOAT3 pos )
+void SolidSphere::SetPos( DirectX::XMFLOAT4 pos )
 {
 	this->pos = pos;
 }

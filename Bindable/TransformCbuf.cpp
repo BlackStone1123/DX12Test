@@ -17,7 +17,7 @@ void TransformCbuf::Bind( Graphics& gfx )
 	TransformMat& mat = GetRawData();
 	mat.ModelMatrix = model;
 	mat.ModelViewMatrix = model * view;
-	mat.InverseTransposeModelViewMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, mat.ModelViewMatrix));
+	mat.InverseTransposeModelMatrix = XMMatrixTranspose(XMMatrixInverse(nullptr, mat.ModelViewMatrix));
 	mat.ModelViewProjectionMatrix = model * view * projection;
 
 	Super::Bind(gfx);

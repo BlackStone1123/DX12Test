@@ -31,13 +31,12 @@ public:
 
 	virtual void Display() override
 	{
-		if (ImGui::Begin("Projector"))
+		if (ImGui::CollapsingHeader("Texture Index"))
 		{
 			static bool check = true;
 			ImGui::Checkbox("checkbox", &check);
 			GetRawData().index = check ? 0 : 1;
 		}
-		ImGui::End();
 	}
 };
 
@@ -104,7 +103,7 @@ Box::Box( Graphics& gfx,
 			->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL)
 		    ->AddSubNode()
 			->SetType(ParameterType::SRV)
-			->SetNumDescriptor(2)
+			->SetNumDescriptor(3)
 			->SetBaseRegister(0);
 
 		auto sig = std::make_unique<RootSignature>(gfx, std::move(root));
@@ -117,13 +116,14 @@ Box::Box( Graphics& gfx,
 		AddStaticBind(std::move(changeIndexBuf));
 		AddStaticBind(std::make_unique<PointLightReference>(gfx.GetPointLight(), 2));
 
-		HeapResource source = gfx.AllocResource(2);
+		HeapResource source = gfx.AllocResource(3);
 		source.SetBindSlot(3);
 		SetHeapResource(source);
 
-		auto mat = std::make_unique<Material>(gfx, source.RequestResource(2));
-		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/Mona_Lisa.jpg", true));
-		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/kappa50.png", true));
+		auto mat = std::make_unique<Material>(gfx, source.RequestResource(3));
+		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2.png", true));
+		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/pexels-david-bartus-963278.jpg", true));
+		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2_specular.png", true));
 		AddStaticBind(std::move(mat));
 	}
 	else

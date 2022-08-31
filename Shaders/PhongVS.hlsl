@@ -19,7 +19,7 @@ struct VSOut
 VSOut main( float3 pos : Position,float3 n : Normal, float2 texCoord: TEXCOORD )
 {
 	VSOut vso;
-	vso.worldPos = mul(positionMatrix.model, float4(pos,1.0f));
+    vso.worldPos = mul(positionMatrix.modelView, float4(pos, 1.0f));
 	vso.pos = mul(positionMatrix.modelViewProj, float4(pos, 1.0f));
 	vso.normal = mul((float3x3)positionMatrix.InverseTransposeModelViewMatrix, n);
 	vso.texCoord = texCoord;

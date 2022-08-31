@@ -19,7 +19,7 @@ DirectX::XMMATRIX Camera::GetMatrix() const
 
 void Camera::Display()
 {
-	if( ImGui::Begin( "Camera" ) )
+	if(ImGui::CollapsingHeader("Camera"))
 	{
 		ImGui::Text( "Position" );
 		ImGui::SliderFloat( "R",&r,1.0f,80.0f,"%.1f" );
@@ -35,7 +35,6 @@ void Camera::Display()
 			Reset();
 		}
 	}
-	ImGui::End();
 }
 
 void Camera::Reset()

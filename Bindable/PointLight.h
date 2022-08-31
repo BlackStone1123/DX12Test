@@ -5,10 +5,10 @@
 class Graphics;
 struct PointLightCBuf
 {
-	DirectX::XMFLOAT3 pos;
-	DirectX::XMFLOAT3 materialColor;
-	DirectX::XMFLOAT3 ambient;
-	DirectX::XMFLOAT3 diffuseColor;
+	DirectX::XMFLOAT4 pos;
+	DirectX::XMFLOAT4 materialColor;
+	DirectX::XMFLOAT4 ambient;
+	DirectX::XMFLOAT4 diffuseColor;
 	float diffuseIntensity;
 	float attConst;
 	float attLin;
@@ -23,11 +23,14 @@ public:
 
 	virtual void Display() override;
 	virtual void Reset() override;
+	virtual void Bind(Graphics& gfx) override;
 
 	void Draw( Graphics& gfx );
 
 private:
+	Graphics* mGfx{ nullptr };
 	SolidSphere mesh;
+	DirectX::XMFLOAT4 mPosW{ 0.0f,0.0f,0.0f, 1.0f };
 };
 
 class PointLightReference : public Bindable

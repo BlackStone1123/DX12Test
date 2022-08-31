@@ -27,7 +27,7 @@ Graphics::Graphics(HWND hwnd, UINT width, UINT height)
     mRTVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_RTV, mNumFrames);
     mRTVDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     mDSVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1);
-    mSRVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 5, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+    mSRVDescriptorHeap = GraphicsUtils::CreateDescriptorHeap(mDevice, D3D12_DESCRIPTOR_HEAP_TYPE::D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 10, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
     mSRVDescriptorSize = mDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
     mSRVCpuHandle = mSRVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
     mSRVGpuHandle = mSRVDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -163,7 +163,7 @@ void Graphics::ResizeDepthBuffer()
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, mWidth, mHeight,
-            1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+            1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE),
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &optimizedClearValue,
         IID_PPV_ARGS(&m_DepthBuffer)

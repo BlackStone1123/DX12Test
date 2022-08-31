@@ -63,14 +63,15 @@ int App::exec()
 			}
 
 			// imgui window to control simulation speed
-			if (ImGui::Begin("Simulation Speed"))
+			bool pOpen = true;
+			if (ImGui::Begin("Control Panel", &pOpen))
 			{
 				ImGui::SliderFloat("Speed Factor", &mSpeedFactor, 0.0f, 4.0f);
 				ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				gfx->ShowImguiItems();
 			}
 			ImGui::End();
 
-			gfx->ShowImguiItems();
 			gfx->EndFrame();
 		}
 	}

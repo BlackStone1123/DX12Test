@@ -17,7 +17,7 @@ DirectX::XMMATRIX Projector::GetMatrix() const
 
 void Projector::Display()
 {
-	if (ImGui::Begin("Projector"))
+	if (ImGui::CollapsingHeader("Projector"))
 	{
 		ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
 		if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
@@ -43,7 +43,6 @@ void Projector::Display()
 			ImGui::EndTabBar();
 		}
 	}
-	ImGui::End();
 }
 void Projector::Reset()
 {

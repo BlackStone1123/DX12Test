@@ -8,7 +8,7 @@ struct TransformMat
 	DirectX::XMMATRIX ModelMatrix;
 	DirectX::XMMATRIX ModelViewMatrix;
 	DirectX::XMMATRIX ModelViewProjectionMatrix;
-	DirectX::XMMATRIX InverseTransposeModelViewMatrix;
+	DirectX::XMMATRIX InverseTransposeModelMatrix;
 };
 
 class TransformCbuf : public ConstantBuffer<TransformMat>

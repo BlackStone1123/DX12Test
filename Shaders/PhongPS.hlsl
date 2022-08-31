@@ -6,10 +6,10 @@ cbuffer SceneConstantBuffer : register(b0)
 
 struct Light
 {
-	float3 lightPos;
-	float3 materialColor;
-	float3 ambient;
-	float3 diffuseColor;
+	float4 lightPos;
+	float4 materialColor;
+	float4 ambient;
+	float4 diffuseColor;
 	float diffuseIntensity;
 	float attConst;
 	float attLin;
@@ -20,20 +20,23 @@ ConstantBuffer<Light> lightProperty : register(b1);
 
 Texture2D tex : register(t0);
 Texture2D tex1 : register(t1);
+Texture2D texSpec : register(t2);
+
 SamplerState splr : register(s0);
 
 float4 main( float3 worldPos : Position,float3 n : Normal, float2 texCoord : TEXCOORD ) : SV_Target
 {
 	// fragment to light vector data
-	const float3 vToL = lightProperty.lightPos - worldPos;
+	const float3 vToL = lightProperty.lightPos.xyz - worldPos.xyz;
 	const float distToL = length( vToL );
 	const float3 dirToL = vToL / distToL;
 	// diffuse attenuation
 	const float att = 1.0f / (lightProperty.attConst + lightProperty.attLin * distToL + lightProperty.attQuad * (distToL * distToL));
 	// diffuse intensity
-	const float3 diffuse = lightProperty.diffuseColor * lightProperty.diffuseIntensity * att * max( 0.0f,dot( dirToL,n ) );
-	const float4 materialColor = tex1.Sample(splr, texCoord);
+	const float4 diffuse = lightProperty.diffuseColor * lightProperty.diffuseIntensity * att * max( 0.0f,dot( dirToL,n ) );
+    const float3 specular = att * (diffuseColor * diffuseIntensity) * specularIntensity * pow(max(0.0f, dot(normalize(-r), normalize(worldPos))), specularPower);
+    const float4 materialColor = index % 2 == 0 ? tex.Sample(splr, texCoord) : tex1.Sample(splr, texCoord);
 
 	// final color
-	return float4(saturate( (diffuse + lightProperty.ambient) * materialColor ),1.0f);
+    return saturate(diffuse + lightProperty.ambient) * materialColor;
 }
