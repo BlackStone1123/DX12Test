@@ -16,15 +16,13 @@ private:
 	std::wstring mFilename;
 };
 
-class Material : public Bindable
-			   , public Resource
+class Material : public Resource
 {
 public:
 	Material(Graphics& gfx,const HeapAllocation& location);
 	virtual ~Material();
 
 	void AddTexture(std::unique_ptr<Texture>);
-	virtual void Bind(Graphics& gfx) override;
 	virtual void Upload(Graphics& gfx) override;
 
 private:

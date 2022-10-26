@@ -12,6 +12,16 @@ public:
 	virtual void Bind(Graphics& gfx) override;
 	virtual void Upload(Graphics& gfx) override;
 
+	static std::shared_ptr<IndexBuffer> Resolve(
+		Graphics& gfx, 
+		const std::string& tag, 
+		const std::vector<unsigned short>& indices);
+
+	template<typename...Ignore>
+	static std::string GenerateUID(const std::string& tag, Ignore&&...ignore)
+	{
+		return typeid(IndexBuffer).name() + "#"s + tag;
+	}
 protected:
 	UINT count;
 	std::vector<unsigned short> m_Indices;

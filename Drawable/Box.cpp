@@ -108,8 +108,8 @@ Box::Box( Graphics& gfx,
 
 		auto sig = std::make_unique<RootSignature>(gfx, std::move(root));
 		auto pso = std::make_unique<PiplineStateObject>(gfx, ied, sig->GetSignature(), pvs->GetBytecode(), pps->GetBytecode());
-		AddStaticBind(std::move(sig));
 		AddStaticBind(std::move(pso));
+		AddStaticBind(std::move(sig));
 
 		auto changeIndexBuf = std::make_unique<ChangeIndex>(gfx, CData());
 		changeIndexBuf->SetBindSlot(1);
@@ -124,7 +124,7 @@ Box::Box( Graphics& gfx,
 		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2.png", true));
 		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/pexels-david-bartus-963278.jpg", true));
 		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2_specular.png", true));
-		AddStaticBind(std::move(mat));
+		AddResource(std::move(mat));
 	}
 	else
 	{
@@ -151,7 +151,24 @@ void Box::Update(float dt )
 
 DirectX::XMMATRIX Box::GetTransformXM() const
 {
-	return DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
+	auto xf = DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
 		DirectX::XMMatrixTranslation(x, 0.0f, 0.0f) *
 		DirectX::XMMatrixRotationRollPitchYaw(theta, phi, chi);
+
+	if (outlining)
+	{
+		xf = DirectX::XMMatrixScaling(1.03f, 1.03f, 1.03f) * xf;
+	}
+	return xf;
+}
+
+void Box::DrawOutline(Graphics& gfx)
+{
+	//outlining = true;
+	//for (auto& b : outlineEffect)
+	//{
+	//	b->Bind(gfx);
+	//}
+	//gfx.DrawIndexed(getIndexBuffer()->GetCount(), 0, D3D12_GPU_DESCRIPTOR_HANDLE());
+	//outlining = false;
 }

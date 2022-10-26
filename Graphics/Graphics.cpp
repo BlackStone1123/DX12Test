@@ -99,7 +99,7 @@ void Graphics::BeginFrame(float r, float g, float b, float a)
     CD3DX12_CPU_DESCRIPTOR_HANDLE dsv(mDSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart());
 
     commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-    commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
     commandList->RSSetViewports(1, &m_Viewport);
     commandList->RSSetScissorRects(1, &m_ScissorRect);
@@ -156,13 +156,13 @@ void Graphics::Resize(UINT width, UINT height)
 void Graphics::ResizeDepthBuffer()
 {
     D3D12_CLEAR_VALUE optimizedClearValue = {};
-    optimizedClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+    optimizedClearValue.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     optimizedClearValue.DepthStencil = { 1.0f, 0 };
 
     ThrowIfFailed(mDevice->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
         D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D32_FLOAT, mWidth, mHeight,
+        &CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_D24_UNORM_S8_UINT, mWidth, mHeight,
             1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE),
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &optimizedClearValue,
@@ -171,7 +171,7 @@ void Graphics::ResizeDepthBuffer()
 
     // Update the depth-stencil view.
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv = {};
-    dsv.Format = DXGI_FORMAT_D32_FLOAT;
+    dsv.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
     dsv.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     dsv.Texture2D.MipSlice = 0;
     dsv.Flags = D3D12_DSV_FLAG_NONE;

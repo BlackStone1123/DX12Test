@@ -1,6 +1,7 @@
 #include "IndexBuffer.h"
 #include "GraphicsUtils.h"
 #include "GraphicContext.h"
+#include "BindableCodex.h"
 
 IndexBuffer::IndexBuffer( Graphics& gfx,const std::vector<unsigned short>& indices )
 	: count( (UINT)indices.size() )
@@ -38,4 +39,13 @@ void IndexBuffer::Upload(Graphics& gfx)
 UINT IndexBuffer::GetCount() const
 {
 	return count;
+}
+
+std::shared_ptr<IndexBuffer> IndexBuffer::Resolve(
+    Graphics& gfx,
+    const std::string& tag,
+    const std::vector<unsigned short>& indices)
+{
+    assert(tag != "?");
+    return Codex::Resolve<IndexBuffer>(gfx, tag, indices);
 }

@@ -13,6 +13,9 @@ public:
 
 	void Update(float dt ) override;
 	DirectX::XMMATRIX GetTransformXM() const override;
+
+	virtual void DrawOutline(Graphics& gfx) override;
+
 private:
 	// positional
 	float x{0.0f};
@@ -34,4 +37,7 @@ private:
 	float dz{1.0f};
 	float dx{0.5f};
 	float dy{0.0f};
+
+	bool outlining{ false };
+	static std::vector<std::shared_ptr<Bindable>> outlineEffect;
 };

@@ -17,6 +17,7 @@ PiplineStateObject::PiplineStateObject(
         CD3DX12_PIPELINE_STATE_STREAM_PS PS;
         CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL_FORMAT DSVFormat;
         CD3DX12_PIPELINE_STATE_STREAM_RENDER_TARGET_FORMATS RTVFormats;
+        CD3DX12_PIPELINE_STATE_STREAM_DEPTH_STENCIL DepthStensil;
     } pipelineStateStream;
 
     D3D12_RT_FORMAT_ARRAY rtvFormats = {};
@@ -28,8 +29,13 @@ PiplineStateObject::PiplineStateObject(
     pipelineStateStream.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     pipelineStateStream.VS = CD3DX12_SHADER_BYTECODE(vertexShader.Get());
     pipelineStateStream.PS = CD3DX12_SHADER_BYTECODE(pixelShader.Get());
-    pipelineStateStream.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
     pipelineStateStream.RTVFormats = rtvFormats;
+
+    //CD3DX12_DEPTH_STENCIL_DESC dpSDecs;
+    //dpSDecs.DepthEnable = false;
+
+    //pipelineStateStream.DepthStensil = dpSDecs;
 
     D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
         sizeof(PipelineStateStream), &pipelineStateStream

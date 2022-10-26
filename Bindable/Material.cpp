@@ -124,10 +124,6 @@ void Material::AddTexture(std::unique_ptr<Texture> sur)
     mTextures.push_back(std::move(sur));
 }
 
-void Material::Bind(Graphics& gfx)
-{
-}
-
 void Material::Upload(Graphics& gfx)
 {
     auto currentHandle = mLocation;

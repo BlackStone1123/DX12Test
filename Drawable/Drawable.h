@@ -14,7 +14,7 @@ class Drawable
 	template<class T>
 	friend class DrawableBase;
 public:
-	using BindableList = std::vector<std::unique_ptr<Bindable>>;
+	using BindableList = std::vector<std::shared_ptr<Bindable>>;
 	using BufferList = std::vector<Resource*>;
 
 	Drawable() = default;
@@ -26,8 +26,23 @@ public:
 	virtual void Update(float dt) = 0;
 
 	void Draw( Graphics& gfx );
-	void AddBind( std::unique_ptr<Bindable> bind );
-	void AddIndexBuffer( std::unique_ptr<IndexBuffer> ibuf );
+	virtual void DrawOutline(Graphics& gfx) {}
+
+	template<class T>
+	T* QueryBindable() noexcept
+	{
+		for (auto& pb : binds)
+		{
+			if (auto pt = dynamic_cast<T*>(pb.get()))
+			{
+				return pt;
+			}
+		}
+		return nullptr;
+	}
+
+protected:
+	void AddBind(std::shared_ptr<Bindable> bind);
 	void AddResource(Resource*);
 
 private:
