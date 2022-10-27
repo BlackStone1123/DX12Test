@@ -17,15 +17,20 @@ private:
 };
 
 class Material : public Resource
+	           , public Bindable
 {
 public:
-	Material(Graphics& gfx,const HeapAllocation& location);
+	Material(Graphics& gfx, UINT textureCount);
 	virtual ~Material();
 
 	void AddTexture(std::unique_ptr<Texture>);
 	virtual void Upload(Graphics& gfx) override;
+	virtual void Bind(Graphics& gfx) override;
+
+	HeapResource& source() { return mSource; }
 
 private:
 	std::vector<std::unique_ptr<Texture>> mTextures;
-	HeapAllocation mLocation;
+	HeapResource mSource;
+	UINT mCount;
 };

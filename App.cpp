@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Projector.h"
 #include "PointLight.h"
+#include "Material.h"
 
 App::App(HINSTANCE hIns, int width, int height)
 	: mImguiManager(std::make_unique<ImguiManager>())
@@ -20,12 +21,21 @@ App::App(HINSTANCE hIns, int width, int height)
 	std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
 
 	mWnd->Gfx()->AddPointLight(std::make_unique<PointLight>(*mWnd->Gfx()));
+
+	auto mat = std::make_shared<Material>(*mWnd->Gfx(), 3);
+	mat->source().SetBindSlot(3);
+
+	mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2.png", true));
+	mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/pexels-david-bartus-963278.jpg", true));
+	mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2_specular.png", true));
+
 	for (auto i = 0; i < 20; i++)
 	{
 		mDrawables.push_back(std::make_unique<Box>(
 			*mWnd->Gfx(), rng, adist,
 			ddist, odist, rdist
 			));
+		mDrawables.back()->AttachMaterial(mat);
 	}
 	//mDrawables.push_back(std::make_unique<SolidSphere>(*mWnd->Gfx(), 0.2f, DirectX::XMFLOAT3(0.5f, 0.5f, 1.0f)));
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "DrawableBase.h"
 
-class Box : public DrawableBase<Box>
+class Box : public Drawable
 {
 public:
 	Box( Graphics& gfx,std::mt19937& rng,
@@ -13,8 +13,6 @@ public:
 
 	void Update(float dt ) override;
 	DirectX::XMMATRIX GetTransformXM() const override;
-
-	virtual void DrawOutline(Graphics& gfx) override;
 
 private:
 	// positional
@@ -39,5 +37,4 @@ private:
 	float dy{0.0f};
 
 	bool outlining{ false };
-	static std::vector<std::shared_ptr<Bindable>> outlineEffect;
 };

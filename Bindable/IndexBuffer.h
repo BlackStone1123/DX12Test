@@ -5,7 +5,7 @@ class IndexBuffer : public Bindable
 				  , public Resource
 {
 public:
-	IndexBuffer( Graphics& gfx,const std::vector<unsigned short>& indices );
+	IndexBuffer( Graphics& gfx,const std::string& tag, const std::vector<unsigned short>& indices );
 	UINT GetCount() const;
 
 public:
@@ -20,10 +20,13 @@ public:
 	template<typename...Ignore>
 	static std::string GenerateUID(const std::string& tag, Ignore&&...ignore)
 	{
+		using namespace std::string_literals;
 		return typeid(IndexBuffer).name() + "#"s + tag;
 	}
 protected:
 	UINT count;
+	std::string mTag;
+
 	std::vector<unsigned short> m_Indices;
 	ComPtr<ID3D12Resource> m_IndexBuffer;
 	ComPtr<ID3D12Resource> m_IntermediateIndexBuffer;

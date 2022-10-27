@@ -57,80 +57,62 @@ Box::Box( Graphics& gfx,
 	, theta( adist( rng ) )
 	, phi( adist( rng ) )
 {
-	if (!IsStaticInitialized())
+	struct Vertex
 	{
-		struct Vertex
-		{
-			DirectX::XMFLOAT3 pos;
-			DirectX::XMFLOAT2 tex;
-			DirectX::XMFLOAT3 normal;
-		};
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT2 tex;
+		DirectX::XMFLOAT3 normal;
+	};
 
-		auto model = Cube::MakeIndependent<Vertex>();
-		model.SetNormalsIndependentFlat();
+	auto model = Cube::MakeIndependent<Vertex>();
+	model.SetNormalsIndependentFlat();
 
-		AddStaticBind(std::make_unique<VertexBuffer<Vertex>>(gfx, model.vertices));
-		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indices));
-		AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+	AddBind(VertexBuffer<Vertex>::Resolve(gfx,"TestBoxVertex", model.vertices));
+	AddBind(IndexBuffer::Resolve(gfx,"TestBoxIndex", model.indices));
+	AddBind(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
-		auto pvs = std::make_unique<Shader>(gfx, L"PhongVS.cso");
-		auto pps = std::make_unique<Shader>(gfx, L"PhongPS.cso");
-		const std::vector<D3D12_INPUT_ELEMENT_DESC> ied =
-		{
-			{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-			{ "TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-			{ "NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 }
-		};
-
-		auto root = std::make_unique<SignatureNode>();
-		root->AddSubNode()
-			->SetType(ParameterType::CBV)
-			->SetBaseRegister(0)
-			->SetVisibility(D3D12_SHADER_VISIBILITY_VERTEX);
-
-		root->AddSubNode()
-			->SetType(ParameterType::CBV)
-			->SetBaseRegister(0)
-			->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL);
-
-		root->AddSubNode()
-			->SetType(ParameterType::CBV)
-			->SetBaseRegister(1)
-			->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL);
-
-		root->AddSubNode()
-			->SetType(ParameterType::TABLE)
-			->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL)
-		    ->AddSubNode()
-			->SetType(ParameterType::SRV)
-			->SetNumDescriptor(3)
-			->SetBaseRegister(0);
-
-		auto sig = std::make_unique<RootSignature>(gfx, std::move(root));
-		auto pso = std::make_unique<PiplineStateObject>(gfx, ied, sig->GetSignature(), pvs->GetBytecode(), pps->GetBytecode());
-		AddStaticBind(std::move(pso));
-		AddStaticBind(std::move(sig));
-
-		auto changeIndexBuf = std::make_unique<ChangeIndex>(gfx, CData());
-		changeIndexBuf->SetBindSlot(1);
-		AddStaticBind(std::move(changeIndexBuf));
-		AddStaticBind(std::make_unique<PointLightReference>(gfx.GetPointLight(), 2));
-
-		HeapResource source = gfx.AllocResource(3);
-		source.SetBindSlot(3);
-		SetHeapResource(source);
-
-		auto mat = std::make_unique<Material>(gfx, source.RequestResource(3));
-		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2.png", true));
-		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/pexels-david-bartus-963278.jpg", true));
-		mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2_specular.png", true));
-		AddResource(std::move(mat));
-	}
-	else
+	auto pvs = std::make_unique<Shader>(gfx, L"PhongVS.cso");
+	auto pps = std::make_unique<Shader>(gfx, L"PhongPS.cso");
+	const std::vector<D3D12_INPUT_ELEMENT_DESC> ied =
 	{
-		SetIndexFromStatic();
-	}
+		{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		{ "TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
+		{ "NORMAL",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 }
+	};
 
+	auto root = std::make_unique<SignatureNode>();
+	root->AddSubNode()
+		->SetType(ParameterType::CBV)
+		->SetBaseRegister(0)
+		->SetVisibility(D3D12_SHADER_VISIBILITY_VERTEX);
+
+	root->AddSubNode()
+		->SetType(ParameterType::CBV)
+		->SetBaseRegister(0)
+		->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL);
+
+	root->AddSubNode()
+		->SetType(ParameterType::CBV)
+		->SetBaseRegister(1)
+		->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL);
+
+	root->AddSubNode()
+		->SetType(ParameterType::TABLE)
+		->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL)
+		->AddSubNode()
+		->SetType(ParameterType::SRV)
+		->SetNumDescriptor(3)
+		->SetBaseRegister(0);
+
+	auto sig = std::make_unique<RootSignature>(gfx, std::move(root));
+	auto pso = std::make_unique<PiplineStateObject>(gfx, ied, sig->GetSignature(), pvs->GetBytecode(), pps->GetBytecode());
+	AddBind(std::move(pso));
+	AddBind(std::move(sig));
+
+	auto changeIndexBuf = std::make_unique<ChangeIndex>(gfx, CData());
+	changeIndexBuf->SetBindSlot(1);
+	AddBind(std::move(changeIndexBuf));
+	AddBind(std::make_unique<PointLightReference>(gfx.GetPointLight(), 2));
 	AddBind( std::make_unique<TransformCbuf>( gfx,*this, 0) );
 }
 
@@ -160,15 +142,4 @@ DirectX::XMMATRIX Box::GetTransformXM() const
 		xf = DirectX::XMMatrixScaling(1.03f, 1.03f, 1.03f) * xf;
 	}
 	return xf;
-}
-
-void Box::DrawOutline(Graphics& gfx)
-{
-	//outlining = true;
-	//for (auto& b : outlineEffect)
-	//{
-	//	b->Bind(gfx);
-	//}
-	//gfx.DrawIndexed(getIndexBuffer()->GetCount(), 0, D3D12_GPU_DESCRIPTOR_HANDLE());
-	//outlining = false;
 }

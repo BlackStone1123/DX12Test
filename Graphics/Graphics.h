@@ -26,7 +26,7 @@ public:
 	void BeginFrame(float r, float g, float b, float a = 1.0f);
 	void EndFrame();
 	void Resize(UINT width, UINT height);
-	void DrawIndexed(UINT count,UINT heapSlot, D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	void DrawIndexed(UINT count);
 
 	DirectX::XMMATRIX GetProjection() const;
 	DirectX::XMMATRIX GetViewMatrix() const;

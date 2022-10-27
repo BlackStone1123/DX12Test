@@ -16,6 +16,9 @@ class Resource
 public:
 	virtual void Upload(Graphics& gfx) = 0;
 	virtual ~Resource() = default;
+
+protected:
+	bool mUpLoaded{ false };
 };
 
 class ImguiItem

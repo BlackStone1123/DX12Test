@@ -109,8 +109,9 @@ void Texture::Bind(Graphics& gfx, D3D12_CPU_DESCRIPTOR_HANDLE handle)
     d3d12Device->CreateShaderResourceView(mTexureBuffer.Get(), &srvDesc, handle);
 }
 
-Material::Material(Graphics& gfx,const HeapAllocation& location)
-    :mLocation(location)
+Material::Material(Graphics& gfx,UINT textureCount)
+    : mSource(gfx.AllocResource(textureCount))
+    , mCount(textureCount)
 {
 }
 
@@ -126,7 +127,10 @@ void Material::AddTexture(std::unique_ptr<Texture> sur)
 
 void Material::Upload(Graphics& gfx)
 {
-    auto currentHandle = mLocation;
+    if (mUpLoaded)
+        return;
+
+    auto currentHandle = mSource.RequestResource(mCount);
 
     for (auto& tex : mTextures)
     {
@@ -134,4 +138,10 @@ void Material::Upload(Graphics& gfx)
         tex->Bind(gfx, currentHandle.cpuHandle);
         currentHandle++;
     }
+    mUpLoaded = true;
+}
+
+void Material::Bind(Graphics& gfx)
+{
+    GraphicContext::GetCommandList(gfx)->SetGraphicsRootDescriptorTable(mSource.GetBindSlot(), mSource.GetResourceLocation());
 }

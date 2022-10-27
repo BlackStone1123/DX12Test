@@ -3,11 +3,11 @@
 #include "GraphicContext.h"
 #include "BindableCodex.h"
 
-IndexBuffer::IndexBuffer( Graphics& gfx,const std::vector<unsigned short>& indices )
+IndexBuffer::IndexBuffer( Graphics& gfx,const std::string& tag, const std::vector<unsigned short>& indices )
 	: count( (UINT)indices.size() )
+    , mTag(tag)
     , m_Indices(indices)
 {
-
 }
 
 void IndexBuffer::Bind( Graphics& gfx )
@@ -17,6 +17,9 @@ void IndexBuffer::Bind( Graphics& gfx )
 
 void IndexBuffer::Upload(Graphics& gfx)
 {
+    if (mUpLoaded)
+        return;
+
     // Upload index buffer data.
     GraphicsUtils::UpdateBufferResource
     (
@@ -34,6 +37,7 @@ void IndexBuffer::Upload(Graphics& gfx)
     m_IndexBufferView.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress();
     m_IndexBufferView.Format = DXGI_FORMAT_R16_UINT;
     m_IndexBufferView.SizeInBytes = (UINT)m_Indices.size() * sizeof(UINT16);
+    mUpLoaded = true;
 }
 
 UINT IndexBuffer::GetCount() const

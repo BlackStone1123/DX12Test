@@ -196,12 +196,8 @@ void Graphics::ResizeRenderTarget()
     UpdateRenderTargetViews(mNumFrames);
 }
 
-void Graphics::DrawIndexed(UINT count,UINT heapSlot, D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle)
+void Graphics::DrawIndexed(UINT count)
 {
-    if (gpuHandle.ptr)
-    {
-        GetDrawCommandList()->SetGraphicsRootDescriptorTable(heapSlot, gpuHandle);
-    }
     GetDrawCommandList()->DrawIndexedInstanced(count, 1, 0, 0, 0);
 }
 
