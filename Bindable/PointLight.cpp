@@ -68,8 +68,7 @@ void PointLight::Bind(Graphics& gfx)
 	Super::Bind(gfx);
 }
 
-void PointLight::Draw( Graphics& gfx )
+void PointLight::Update()
 {
 	mesh.SetPos(mPosW);
-	mesh.Draw( gfx );
 }

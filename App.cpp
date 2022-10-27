@@ -9,6 +9,7 @@
 #include "Projector.h"
 #include "PointLight.h"
 #include "Material.h"
+#include "Pass.h"
 
 App::App(HINSTANCE hIns, int width, int height)
 	: mImguiManager(std::make_unique<ImguiManager>())
@@ -23,11 +24,14 @@ App::App(HINSTANCE hIns, int width, int height)
 	mWnd->Gfx()->AddPointLight(std::make_unique<PointLight>(*mWnd->Gfx()));
 
 	auto mat = std::make_shared<Material>(*mWnd->Gfx(), 3);
-	mat->source().SetBindSlot(3);
-
 	mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2.png", true));
 	mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/pexels-david-bartus-963278.jpg", true));
 	mat->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2_specular.png", true));
+
+	auto mat2 = std::make_shared<Material>(*mWnd->Gfx(), 3);
+	mat2->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/img-hero_dog.png", true));
+	mat2->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/shutterstock_673465372.jpg", true));
+	mat2->AddTexture(std::make_unique<Texture>(L"../../../Assets/Texture/container2_specular.png", true));
 
 	for (auto i = 0; i < 20; i++)
 	{
@@ -35,9 +39,9 @@ App::App(HINSTANCE hIns, int width, int height)
 			*mWnd->Gfx(), rng, adist,
 			ddist, odist, rdist
 			));
-		mDrawables.back()->AttachMaterial(mat);
+		mDrawables.back()->AttachMaterial(i%2 == 0 ? mat : mat2);
+		mBorders.push_back(std::make_unique<Border>(*mWnd->Gfx()));
 	}
-	//mDrawables.push_back(std::make_unique<SolidSphere>(*mWnd->Gfx(), 0.2f, DirectX::XMFLOAT3(0.5f, 0.5f, 1.0f)));
 
 	mWnd->Gfx()->AddCamera(std::make_unique<Camera>());
 	mWnd->Gfx()->AddProjector(std::make_unique<Projector>(width, height));
@@ -50,6 +54,11 @@ App::~App()
 
 int App::exec()
 {
+	SolidColorPass solidPass( *mWnd->Gfx(), { 1.0f,1.0f,1.0f });
+	PhongShaderPass phongPass( *mWnd->Gfx());
+	BorderPass borderPass( *mWnd->Gfx(), { 0.0f,1.0f,0.0f});
+	bool enableBorder = false;
+
 	while (true)
 	{
 		// process all messages pending, but to not block for new messages
@@ -64,12 +73,27 @@ int App::exec()
 			const auto dt = mTimer.Mark() * mSpeedFactor;
 
 			gfx->BeginFrame(0.4f, 0.6f, 0.9f, 1.0f);
-			gfx->GetPointLight()->Draw(*gfx);
+			gfx->GetPointLight()->Update();
+
+			solidPass.AttachDrawable(gfx->GetPointLight()->getGeo());
+			solidPass.Execute(*gfx);
 
 			for (int i = 0; i < mDrawables.size(); i++)
 			{
 				mDrawables[i]->Update(dt);
-				mDrawables[i]->Draw(*gfx);
+				phongPass.AttachDrawable(mDrawables[i].get());
+			}
+			phongPass.SetPointLight(gfx->GetPointLight());
+			phongPass.Execute(*gfx);
+
+			if (enableBorder)
+			{
+				for (int i = 0; i < mDrawables.size(); i++)
+				{
+					mBorders[i]->setTransformXM(mDrawables[i]->GetTransformXM());
+					borderPass.AttachDrawable(mBorders[i].get());
+				}
+				borderPass.Execute(*gfx);
 			}
 
 			// imgui window to control simulation speed
@@ -78,6 +102,8 @@ int App::exec()
 			{
 				ImGui::SliderFloat("Speed Factor", &mSpeedFactor, 0.0f, 4.0f);
 				ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				ImGui::Checkbox("enable border", &enableBorder);
+
 				gfx->ShowImguiItems();
 			}
 			ImGui::End();

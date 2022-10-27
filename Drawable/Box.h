@@ -35,6 +35,19 @@ private:
 	float dz{1.0f};
 	float dx{0.5f};
 	float dy{0.0f};
+};
 
-	bool outlining{ false };
+class Border : public Drawable
+{
+public:
+	Border(Graphics& gfx);
+	virtual ~Border();
+
+	void Update(float dt) override {}
+
+	DirectX::XMMATRIX GetTransformXM() const override;
+	void setTransformXM(const DirectX::XMMATRIX&);
+
+private:
+	DirectX::XMMATRIX mMatrix;
 };

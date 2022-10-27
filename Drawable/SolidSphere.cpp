@@ -16,40 +16,7 @@ SolidSphere::SolidSphere( Graphics& gfx,float radius, const DirectX::XMFLOAT3& c
 	AddBind(VertexBuffer<Vertex>::Resolve( gfx,"SolidSphereVertex", model.vertices));
 	AddBind(IndexBuffer::Resolve( gfx, "SolidSphereIndex",model.indices ) );
 	AddBind(Topology::Resolve(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-
-	auto pvs = std::make_unique<Shader>( gfx,L"SolidVS.cso" );
-	auto pps = std::make_unique<Shader>(gfx, L"SolidPS.cso");
-
-	const std::vector<D3D12_INPUT_ELEMENT_DESC> ied =
-	{
-		{ "Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0 },
-	};
-
-	auto root = std::make_unique<SignatureNode>();
-	root->AddSubNode()
-		->SetType(ParameterType::CBV)
-		->SetBaseRegister(0)
-		->SetVisibility(D3D12_SHADER_VISIBILITY_VERTEX);
-
-	root->AddSubNode()
-		->SetType(ParameterType::Constant)
-		->SetNumDescriptor(sizeof(DirectX::XMFLOAT4) / 4)
-		->SetBaseRegister(0)
-		->SetVisibility(D3D12_SHADER_VISIBILITY_PIXEL);
-
-	auto sig = std::make_unique<RootSignature>(gfx, std::move(root));
-	auto pso = std::make_unique<PiplineStateObject>(
-		gfx, 
-		ied, 
-		sig->GetSignature(), 
-		pvs->GetBytecode(), 
-		pps->GetBytecode()
-		);
-
-	AddBind(std::move(sig));
-	AddBind(std::move(pso));
 	AddBind( std::make_unique<TransformCbuf>( gfx,*this, 0) );
-	AddBind(std::make_unique<ColorCbuf>(gfx, color, 1));
 }
 
 void SolidSphere::Update( float dt ) {}

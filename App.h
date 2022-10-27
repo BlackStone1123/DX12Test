@@ -6,6 +6,7 @@
 class Window;
 class ImguiManager;
 class Drawable;
+class Border;
 class App
 {
 public:
@@ -18,6 +19,7 @@ private:
 	std::unique_ptr<Window> mWnd;
 
 	std::vector<std::unique_ptr<Drawable>> mDrawables;
+	std::vector<std::unique_ptr<Border>> mBorders;
 
 	ChiliTimer mTimer;
 	float mSpeedFactor = 1.0f;

@@ -33,6 +33,7 @@ void HeapResource::SetBindSlot(UINT slot)
 {
 	mSlot = slot;
 }
+
 UINT HeapResource::GetBindSlot() const
 {
 	return mSlot;

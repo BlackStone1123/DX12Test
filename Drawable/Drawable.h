@@ -9,6 +9,7 @@ class Bindable;
 class Graphics;
 class Resource;
 class Material;
+class TransformCbuf;
 
 class Drawable
 {
@@ -24,6 +25,10 @@ public:
 	virtual void Update(float dt) = 0;
 
 	void AttachMaterial(std::shared_ptr<Material> mat);
+
+	Material* GetMaterial();
+	TransformCbuf* getTransformCBuf();
+
 	void Draw( Graphics& gfx );
 
 	template<class T>

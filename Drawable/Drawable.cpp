@@ -5,6 +5,7 @@
 #include "Bindable.h"
 #include "Graphics.h"
 #include "Material.h"
+#include "TransformCbuf.h"
 
 void Drawable::AttachMaterial(std::shared_ptr<Material> mat)
 {
@@ -44,6 +45,16 @@ void Drawable::AddBind( std::shared_ptr<Bindable> bind )
 	}
 
 	binds.push_back( std::move( bind ) );
+}
+
+Material* Drawable::GetMaterial()
+{
+	return QueryBindable<Material>();
+}
+
+TransformCbuf* Drawable::getTransformCBuf()
+{
+	return QueryBindable<TransformCbuf>();
 }
 
 Drawable::~Drawable() = default;

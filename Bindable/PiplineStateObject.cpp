@@ -6,7 +6,8 @@ PiplineStateObject::PiplineStateObject(
     const std::vector<D3D12_INPUT_ELEMENT_DESC>& inputLayout,
 	ComPtr<ID3D12RootSignature> signature,
 	ComPtr<ID3DBlob> vertexShader,
-	ComPtr<ID3DBlob> pixelShader)
+	ComPtr<ID3DBlob> pixelShader,
+    StencilMode mode) : mMode(mode)
 {
     struct PipelineStateStream
     {
@@ -32,10 +33,23 @@ PiplineStateObject::PiplineStateObject(
     pipelineStateStream.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
     pipelineStateStream.RTVFormats = rtvFormats;
 
-    //CD3DX12_DEPTH_STENCIL_DESC dpSDecs;
-    //dpSDecs.DepthEnable = false;
+    CD3DX12_DEPTH_STENCIL_DESC dsDesc = CD3DX12_DEPTH_STENCIL_DESC{ CD3DX12_DEFAULT{} };
+    if (mode == StencilMode::Write)
+    {
+        dsDesc.StencilEnable = TRUE;
+        dsDesc.StencilWriteMask = 0xFF;
+        dsDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+        dsDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+    }
+    else if (mode == StencilMode::Mask)
+    {
+        dsDesc.StencilEnable = TRUE;
+        dsDesc.StencilReadMask = 0xFF;
+        dsDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_NOT_EQUAL;
+        dsDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_KEEP;
+    }
 
-    //pipelineStateStream.DepthStensil = dpSDecs;
+    pipelineStateStream.DepthStensil = dsDesc;
 
     D3D12_PIPELINE_STATE_STREAM_DESC pipelineStateStreamDesc = {
         sizeof(PipelineStateStream), &pipelineStateStream
@@ -47,5 +61,10 @@ PiplineStateObject::PiplineStateObject(
 
 void PiplineStateObject::Bind( Graphics& gfx )
 {
-    GraphicContext::GetCommandList( gfx )->SetPipelineState(m_PipelineState.Get());;
+    GraphicContext::GetCommandList( gfx )->SetPipelineState(m_PipelineState.Get());
+
+    if (mMode != StencilMode::Off)
+    {
+        GraphicContext::GetCommandList(gfx)->OMSetStencilRef(0xff);
+    }
 }

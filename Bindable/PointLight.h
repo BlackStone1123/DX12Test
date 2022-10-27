@@ -25,33 +25,11 @@ public:
 	virtual void Reset() override;
 	virtual void Bind(Graphics& gfx) override;
 
-	void Draw( Graphics& gfx );
+	void Update();
+	SolidSphere* getGeo() { return &mesh; }
 
 private:
 	Graphics* mGfx{ nullptr };
 	SolidSphere mesh;
 	DirectX::XMFLOAT4 mPosW{ 0.0f,0.0f,0.0f, 1.0f };
-};
-
-class PointLightReference : public Bindable
-{
-public:
-	PointLightReference(PointLight* pPointLight, UINT slot)
-		: mPointLight(pPointLight)
-		, mSlot(slot)
-	{
-
-	}
-	virtual void Bind(Graphics& gfx) override
-	{
-		if (mPointLight)
-		{
-			mPointLight->SetBindSlot(mSlot);
-			mPointLight->Bind(gfx);
-		}
-	}
-
-private:
-	PointLight* mPointLight{ nullptr };
-	UINT mSlot;
 };
